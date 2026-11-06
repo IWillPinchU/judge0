@@ -86,8 +86,8 @@ setup_cgroup_v2() {
         echo "+$c" > "$CG_ISOLATE_SLICE/cgroup.subtree_control" 2>/dev/null || true
     done
 
-    # Tell isolate v2 where the delegation root is.
-    mkdir -p /run/isolate
+    # Tell isolate v2 where the delegation root and locks are.
+    mkdir -p /run/isolate/locks
     echo "$CG_ISOLATE_SLICE" > /run/isolate/cgroup
 
     return 0

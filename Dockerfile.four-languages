@@ -42,13 +42,14 @@ RUN if [ -f /usr/local/etc/isolate ]; then sed -i 's/^num_boxes\s*=.*/num_boxes 
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
 CMD ["/api/scripts/server"]
 
-# Setup non-root judge0 user with sudo permissions required by isolate
+# Setup sudo permissions and user
 RUN useradd -u 1000 -m -r judge0 && \
-    echo "judge0 ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+    echo "root ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+    echo "judge0 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     mkdir -p /api/tmp && \
     chown -R judge0: /api/tmp/
 
-USER judge0
+USER root
 
 ENV JUDGE0_VERSION "1.13.1-four"
 LABEL version=$JUDGE0_VERSION
