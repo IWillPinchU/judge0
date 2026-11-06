@@ -36,6 +36,9 @@ RUN apt-get update && \
 RUN sed -i 's/\r$//' /api/docker-entrypoint.sh /api/scripts/* && \
     chmod +x /api/docker-entrypoint.sh /api/scripts/*
 
+# Patch isolate v2 box limit from default 1000 to INT_MAX (prevents box out-of-range when suite.id >= 1000)
+RUN if [ -f /usr/local/etc/isolate ]; then sed -i 's/^num_boxes\s*=.*/num_boxes = 2147483647/' /usr/local/etc/isolate; fi
+
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
 CMD ["/api/scripts/server"]
 

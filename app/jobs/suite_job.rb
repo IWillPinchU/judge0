@@ -75,7 +75,7 @@ class SuiteJob < ApplicationJob
     -w 4 \
     -k #{Config::MAX_STACK_LIMIT} \
     -p#{Config::MAX_MAX_PROCESSES_AND_OR_THREADS} \
-    #{suite.enable_per_process_and_thread_time_limit ? (cgroups.present? ? "--no-cg-timing" : "") : "--cg-timing"} \
+    --open-files=#{Config::MAX_MAX_OPEN_FILES} \
     #{suite.enable_per_process_and_thread_memory_limit ? "-m " : "--cg-mem="}#{Config::MAX_MEMORY_LIMIT} \
     -f #{Config::MAX_EXTRACT_SIZE} \
     --run \
@@ -114,7 +114,7 @@ class SuiteJob < ApplicationJob
     -w #{Config::MAX_WALL_TIME_LIMIT} \
     -k #{Config::MAX_STACK_LIMIT} \
     -p#{Config::MAX_MAX_PROCESSES_AND_OR_THREADS} \
-    #{suite.enable_per_process_and_thread_time_limit ? (cgroups.present? ? "--no-cg-timing" : "") : "--cg-timing"} \
+    --open-files=#{Config::MAX_MAX_OPEN_FILES} \
     #{suite.enable_per_process_and_thread_memory_limit ? "-m " : "--cg-mem="}#{Config::MAX_MEMORY_LIMIT} \
     -f #{Config::MAX_MAX_FILE_SIZE} \
     -E HOME=/tmp \
@@ -193,7 +193,7 @@ class SuiteJob < ApplicationJob
     -w #{suite.wall_time_limit} \
     -k #{suite.stack_limit} \
     -p#{suite.max_processes_and_or_threads} \
-    #{suite.enable_per_process_and_thread_time_limit ? (cgroups.present? ? "--no-cg-timing" : "") : "--cg-timing"} \
+    --open-files=#{Config::MAX_OPEN_FILES} \
     #{suite.enable_per_process_and_thread_memory_limit ? "-m " : "--cg-mem="}#{suite.memory_limit} \
     -f #{suite.max_file_size} \
     -E HOME=/tmp \
