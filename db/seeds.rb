@@ -1,5 +1,10 @@
 require_relative 'languages/archived'
-require_relative 'languages/active'
+
+if ENV["JUDGE0_LEAN_MODE"] == "true" || ENV["JUDGE0_LANGUAGES"] == "four"
+  require_relative 'languages/active_four_languages'
+else
+  require_relative 'languages/active'
+end
 
 ActiveRecord::Base.transaction do
   Language.unscoped.delete_all
