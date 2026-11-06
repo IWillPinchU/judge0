@@ -178,6 +178,7 @@ class SuiteJob < ApplicationJob
   end
 
   def execute_test_cases
+    reset_cgroup
     run_script = boxdir + "/run.sh"
     command_line_arguments = suite.command_line_arguments.to_s.strip.encode("UTF-8", invalid: :replace).gsub(/[$&;<>|`]/, "")
     File.open(run_script, "w") { |f| f.write("#{suite.language.run_cmd} #{command_line_arguments}") }
@@ -248,6 +249,7 @@ class SuiteJob < ApplicationJob
       end
 
       test_case.save
+      reset_cgroup
 
       send_webhook({
         type: "test_case",
@@ -301,6 +303,15 @@ class SuiteJob < ApplicationJob
 
   def fix_permissions
     `sudo chown -R $(whoami): #{boxdir}`
+  end
+
+  def reset_cgroup
+    return unless cgroups.present? && box_id
+    cg_root = (File.read("/run/isolate/cgroup").strip rescue "/sys/fs/cgroup/isolate.slice")
+    box_cg = "#{cg_root}/box-#{box_id}"
+    if Dir.exist?(box_cg)
+      `rmdir #{box_cg} 2>/dev/null && mkdir #{box_cg} 2>/dev/null`
+    end
   end
 
   def send_webhook(payload)
