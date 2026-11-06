@@ -38,8 +38,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/about",
-              "host": ["{{base_url}}"],
-              "path": ["about"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "about"
+              ]
             },
             "description": "Returns current Judge0 version (v1.13.1-four) and build metadata."
           }
@@ -51,8 +55,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/languages",
-              "host": ["{{base_url}}"],
-              "path": ["languages"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "languages"
+              ]
             },
             "description": "Returns all 4 active OA languages: C (50), C++ (54), Java (62), Python (71)."
           }
@@ -64,8 +72,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/languages/54",
-              "host": ["{{base_url}}"],
-              "path": ["languages", "54"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "languages",
+                "54"
+              ]
             },
             "description": "Returns compilation and execution parameters for C++ (GCC 12)."
           }
@@ -77,8 +90,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/statuses",
-              "host": ["{{base_url}}"],
-              "path": ["statuses"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "statuses"
+              ]
             },
             "description": "Returns all 14 execution status descriptions (In Queue, Processing, Accepted, WA, TLE, CE, etc.)."
           }
@@ -90,8 +107,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/config_info",
-              "host": ["{{base_url}}"],
-              "path": ["config_info"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "config_info"
+              ]
             },
             "description": "Returns active configuration parameters including CPU time limits and cgroup memory limits."
           }
@@ -103,8 +124,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/system_info",
-              "host": ["{{base_url}}"],
-              "path": ["system_info"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "system_info"
+              ]
             },
             "description": "Returns host server stats, CPU load, and worker process counts."
           }
@@ -142,10 +167,18 @@
               "raw": "{\n  \"language_id\": 54,\n  \"source_code\": \"#include <iostream>\\nint main() {\\n    int a, b;\\n    if (std::cin >> a >> b) {\\n        std::cout << (a + b) << std::endl;\\n    }\\n    return 0;\\n}\",\n  \"test_cases\": [\n    {\n      \"stdin\": \"10 20\\n\",\n      \"expected_output\": \"30\\n\"\n    },\n    {\n      \"stdin\": \"100 250\\n\",\n      \"expected_output\": \"350\\n\"\n    },\n    {\n      \"stdin\": \"-5 15\\n\",\n      \"expected_output\": \"10\\n\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/suites?wait=true",
-              "host": ["{{base_url}}"],
-              "path": ["suites"],
+              "raw": "{{base_url}}/suites?base64_encoded=false&wait=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites"
+              ],
               "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                },
                 {
                   "key": "wait",
                   "value": "true"
@@ -182,10 +215,18 @@
               "raw": "{\n  \"language_id\": 71,\n  \"source_code\": \"import sys\\nfor line in sys.stdin:\\n    parts = line.strip().split()\\n    if len(parts) >= 2:\\n        print(int(parts[0]) * int(parts[1]))\",\n  \"test_cases\": [\n    {\n      \"stdin\": \"4 5\\n\",\n      \"expected_output\": \"20\\n\"\n    },\n    {\n      \"stdin\": \"12 12\\n\",\n      \"expected_output\": \"144\\n\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/suites?wait=false",
-              "host": ["{{base_url}}"],
-              "path": ["suites"],
+              "raw": "{{base_url}}/suites?base64_encoded=false&wait=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites"
+              ],
               "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                },
                 {
                   "key": "wait",
                   "value": "false"
@@ -201,9 +242,20 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/suites/{{suite_token}}",
-              "host": ["{{base_url}}"],
-              "path": ["suites", "{{suite_token}}"]
+              "raw": "{{base_url}}/suites/{{suite_token}}?base64_encoded=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites",
+                "{{suite_token}}"
+              ],
+              "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                }
+              ]
             },
             "description": "Polls the status of an asynchronous suite submission. Returns overall suite status and all individual test case results."
           }
@@ -214,10 +266,19 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/suites/{{suite_token}}?fields=token,status,test_cases",
-              "host": ["{{base_url}}"],
-              "path": ["suites", "{{suite_token}}"],
+              "raw": "{{base_url}}/suites/{{suite_token}}?base64_encoded=false&fields=token,status,test_cases",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites",
+                "{{suite_token}}"
+              ],
               "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                },
                 {
                   "key": "fields",
                   "value": "token,status,test_cases"
@@ -233,9 +294,21 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/suites/test_cases/{{test_case_token}}",
-              "host": ["{{base_url}}"],
-              "path": ["suites", "test_cases", "{{test_case_token}}"]
+              "raw": "{{base_url}}/suites/test_cases/{{test_case_token}}?base64_encoded=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites",
+                "test_cases",
+                "{{test_case_token}}"
+              ],
+              "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                }
+              ]
             },
             "description": "Fetches execution telemetry (time, memory, stdout, stderr, exit_code) for a single test case within a suite."
           }
@@ -255,10 +328,18 @@
               "raw": "{\n  \"language_id\": 62,\n  \"source_code\": \"import java.util.Scanner;\\npublic class Main {\\n    public static void main(String[] args) {\\n        Scanner sc = new Scanner(System.in);\\n        while (sc.hasNextInt()) {\\n            int n = sc.nextInt();\\n            System.out.println(n * n);\\n        }\\n    }\\n}\",\n  \"test_cases\": [\n    {\n      \"stdin\": \"5\\n\",\n      \"expected_output\": \"25\\n\"\n    },\n    {\n      \"stdin\": \"10\\n\",\n      \"expected_output\": \"100\\n\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/suites?wait=true",
-              "host": ["{{base_url}}"],
-              "path": ["suites"],
+              "raw": "{{base_url}}/suites?base64_encoded=false&wait=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites"
+              ],
               "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                },
                 {
                   "key": "wait",
                   "value": "true"
@@ -283,10 +364,18 @@
               "raw": "{\n  \"language_id\": 54,\n  \"source_code\": \"#include <iostream>\\nint main() { INVALID_SYNTAX_ERROR return 0; }\",\n  \"test_cases\": [\n    {\n      \"stdin\": \"1\\n\",\n      \"expected_output\": \"1\\n\"\n    },\n    {\n      \"stdin\": \"2\\n\",\n      \"expected_output\": \"2\\n\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/suites?wait=true",
-              "host": ["{{base_url}}"],
-              "path": ["suites"],
+              "raw": "{{base_url}}/suites?base64_encoded=false&wait=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "suites"
+              ],
               "query": [
+                {
+                  "key": "base64_encoded",
+                  "value": "false"
+                },
                 {
                   "key": "wait",
                   "value": "true"
@@ -329,8 +418,12 @@
             },
             "url": {
               "raw": "{{base_url}}/submissions?base64_encoded=false&wait=true",
-              "host": ["{{base_url}}"],
-              "path": ["submissions"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions"
+              ],
               "query": [
                 {
                   "key": "base64_encoded",
@@ -373,8 +466,12 @@
             },
             "url": {
               "raw": "{{base_url}}/submissions?base64_encoded=false",
-              "host": ["{{base_url}}"],
-              "path": ["submissions"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions"
+              ],
               "query": [
                 {
                   "key": "base64_encoded",
@@ -392,8 +489,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/submissions/{{submission_token}}?base64_encoded=false",
-              "host": ["{{base_url}}"],
-              "path": ["submissions", "{{submission_token}}"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions",
+                "{{submission_token}}"
+              ],
               "query": [
                 {
                   "key": "base64_encoded",
@@ -411,8 +513,12 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/submissions?page=1&per_page=10&base64_encoded=false",
-              "host": ["{{base_url}}"],
-              "path": ["submissions"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -438,8 +544,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/submissions/{{submission_token}}",
-              "host": ["{{base_url}}"],
-              "path": ["submissions", "{{submission_token}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions",
+                "{{submission_token}}"
+              ]
             },
             "description": "Deletes finished submission record from database."
           }
@@ -465,8 +576,13 @@
             },
             "url": {
               "raw": "{{base_url}}/submissions/batch?base64_encoded=false",
-              "host": ["{{base_url}}"],
-              "path": ["submissions", "batch"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions",
+                "batch"
+              ],
               "query": [
                 {
                   "key": "base64_encoded",
@@ -484,8 +600,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/submissions/batch?tokens={{submission_token}}&base64_encoded=false&fields=token,status,time,memory",
-              "host": ["{{base_url}}"],
-              "path": ["submissions", "batch"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "submissions",
+                "batch"
+              ],
               "query": [
                 {
                   "key": "tokens",
@@ -508,4 +629,3 @@
     }
   ]
 }
-
