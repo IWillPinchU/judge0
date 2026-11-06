@@ -32,17 +32,28 @@ isolate \
 
 ### The Three Watchdog Scenarios:
 
-```mermaid
-flowchart TD
-    A["User Code Execution Begins"] --> B{"Is it actively burning CPU?"}
-    
-    B -- "YES: CPU-Bound Loop (while true)" --> C["Kernel tracks CPU cycles via cgroup cpu.stat"]
-    C --> D{"CPU Time > 2.0s + 0.5s?"}
-    D -- "YES" --> E["Kernel sends SIGXCPU / SIGKILL -> Status 5 (TLE) in ~2.0s"]
-    
-    B -- "NO: Idle / Sleeping (sleep(100))" --> F["Isolate monotonic wall clock advances"]
-    F --> G{"Elapsed Wall Time > 10.0s?"}
-    G -- "YES" --> H["Isolate sends SIGKILL -> Status 5 (TLE) at exactly 10.0s"]
+```text
+                          [ User Code Execution Begins ]
+                                        │
+                                        ▼
+                       Is it actively burning CPU cycles?
+                                        │
+                    ┌───────────────────┴───────────────────┐
+                    ▼                                       ▼
+    YES: Active CPU Burn (e.g. while true)     NO: Idle / Sleeping (e.g. sleep(100))
+                    │                                       │
+                    ▼                                       ▼
+    [ Kernel Tracks CPU Clock: cpu.stat ]     [ Isolate Tracks Wall Clock: Monotonic ]
+                    │                                       │
+                    ▼                                       ▼
+       CPU Time > 2.0s + 0.5s Grace?           Elapsed Wall Time > 10.0s Limit?
+                    │                                       │
+                    ▼                                       ▼
+   Kernel sends SIGXCPU / SIGKILL              Isolate forcefully kills with SIGKILL
+                    │                                       │
+                    ▼                                       ▼
+      Status 5: Time Limit Exceeded               Status 5: Time Limit Exceeded
+          (Terminates in ~2.0s!)                     (Terminates in 10.0s!)
 ```
 
 1. **CPU-Bound Infinite Loop (`while (true) {}`)**:

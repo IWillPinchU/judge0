@@ -12,25 +12,38 @@
 
 ## 2. Core Architecture
 
-```mermaid
-flowchart TD
-    Client["Client / Online Assessment Platform"] -->|POST /suites| Puma["Judge0 API Server (Puma)"]
-    Puma -->|Validate & Save| Postgres[(PostgreSQL 16: suites & suite_test_cases)]
-    Puma -->|1 Job per Suite| RedisQ["Redis Queue (Resque)"]
-    RedisQ --> Worker["Judge0 Worker (SuiteJob)"]
-    
-    subgraph Sandbox ["Isolate Sandbox Box"]
-        Worker -->|1. Single Compilation| Compiler["g++ / gcc / javac / python compile"]
-        Compiler -->|2. Retain Binary| Binary["Compiled Executable (a.out / Main.class)"]
-        Binary -->|Test 1: stdin 1| Run1["Execution 1 -> stdout 1"]
-        Binary -->|Test 2: stdin 2| Run2["Execution 2 -> stdout 2"]
-        Binary -->|Test N: stdin N| RunN["Execution N -> stdout N"]
-    end
-
-    Run1 -->|Telemetry + Webhook| Client
-    Run2 -->|Telemetry + Webhook| Client
-    RunN -->|Telemetry + Webhook| Client
-    Worker -->|Final Suite Status & DB Update| Postgres
+```text
+  [ Client Application / OA Platform ]
+                   │
+                   ▼  POST /suites (1 Suite containing N Test Cases)
+       [ Puma / Rails API Server ]
+         │                     │
+         │ Validate & Save     │ Enqueue 1 Job (resque:queue:suites)
+         ▼                     ▼
+  [ PostgreSQL DB ]     [ Redis Queue ] (Only 1 slot consumed!)
+  (suites + test_cases)        │
+                               ▼
+                    [ Resque Worker (SuiteJob) ]
+                               │
+               ┌───────────────┴────────────────┐
+               │    ISOLATE SANDBOX (Box N)     │
+               │                                │
+               │  1. Single Compilation        │
+               │     g++ / gcc / javac / python │
+               │                │               │
+               │                ▼               │
+               │  2. Retain Compiled Executable │
+               │     (./a.out or Main.class)    │
+               │                │               │
+               │                ▼               │
+               │  3. Loop Through Test Cases    │
+               │     ├─► Exec 1 (stdin 1)       │
+               │     ├─► Exec 2 (stdin 2)       │
+               │     └─► Exec N (stdin N)       │
+               └────────────────┬───────────────┘
+                                │
+                                ▼
+            [ Real-time Webhooks & Suite Telemetry ]
 ```
 
 ---

@@ -4,8 +4,6 @@
 
 ## 1. Executive Execution Flow Comparison
 
-### Visual Architecture Flowchart (ASCII)
-
 ```text
 ====================================================================================================
                         ORIGINAL UPSTREAM JUDGE0 (Legacy Batch API)
@@ -73,39 +71,9 @@ Client Application
 ====================================================================================================
 ```
 
-### Mermaid Diagram
-```mermaid
-flowchart TD
-    subgraph Original_Judge0["Original Upstream Judge0 (Legacy Batch API)"]
-        O1["Client: POST /submissions/batch"] --> O2["Rails API Server"]
-        O2 --> O3["PostgreSQL: N Submission Records"]
-        O2 --> O4["Redis Queue: N Slots Occupied"]
-        O4 --> O5["Cluster Workers Hijacked"]
-        O5 --> O6["Recompile Source Code N Times"]
-        O6 --> O7["Run Test Case and Destroy Sandbox"]
-    end
-
-    subgraph Modern_Judge0["Modernized Engine (Compile-Once Suite API)"]
-        M1["Client: POST /suites"] --> M2["Rails API Server"]
-        M2 --> M3["PostgreSQL: 1 Suite + N Test Cases"]
-        M2 --> M4["Redis Queue: 1 Slot Occupied"]
-        M4 --> M5["Single Resque Worker"]
-        M5 --> M6["Init Sandbox Once"]
-        M6 --> M7["Compile Source Code ONCE"]
-        M7 --> M8{"Compilation Success?"}
-        M8 -- "NO" --> M9["Fail-Fast Abort in 0.78s (Run 0 Tests)"]
-        M8 -- "YES" --> M10["Run Test 1 -> reset_cgroup"]
-        M10 --> M11["Run Test 2 -> reset_cgroup"]
-        M11 --> M12["Run Test N -> reset_cgroup"]
-        M12 --> M13["Final Suite Results & Webhooks"]
-    end
-```
-
 ---
 
 ## 2. Sandboxing & Cgroup Architecture
-
-### Visual Sandbox Flow (ASCII)
 
 ```text
 ====================================================================================================
@@ -166,79 +134,67 @@ flowchart TD
 ====================================================================================================
 ```
 
-### Mermaid Diagram
-```mermaid
-flowchart TD
-    subgraph Host_Level["Host & Container Initialization"]
-        H1["Unified Cgroup v2 Host"] --> H2["Container Entrypoint (USER root)"]
-        H2 --> H3["/sys/fs/cgroup Root"]
-    end
-
-    subgraph Sibling_Hierarchy["Sibling Cgroup Layout"]
-        H3 --> S1["api.scope (Rails Server & Resque Workers)"]
-        H3 --> S2["isolate.slice (Sandbox Controller Hierarchy)"]
-    end
-
-    subgraph Sandbox_Execution["Per-Box Isolation & Limits"]
-        S2 --> B1["box-0 cgroup"]
-        S2 --> B2["box-N cgroup"]
-        B2 --> L1["Physical RSS Limit: memory.max"]
-        B2 --> L2["Process / Thread Cap: pids.max"]
-        B2 --> L3["Cumulative CPU Reset: reset_cgroup"]
-        B2 --> L4["Capacity Limit: 2.14 Billion Boxes"]
-    end
-```
-
 ---
 
 ## 3. Database Schema Evolution
 
-```mermaid
-erDiagram
-    SUBMISSIONS_LEGACY {
-        int id PK
-        string token
-        text source_code
-        text stdin
-        text stdout
-        text stderr
-        int status_id
-        decimal time
-        int memory
-        datetime created_at
-    }
+```text
+====================================================================================================
+                              DATABASE ENTITY-RELATIONSHIP MODEL
+====================================================================================================
 
-    SUITES {
-        int id PK
-        string token UK
-        int language_id
-        text source_code
-        int status_id
-        text compile_output
-        decimal cpu_time_limit
-        decimal wall_time_limit
-        int memory_limit
-        string callback_url
-        datetime created_at
-    }
+  [ submissions ] (Legacy Monolithic Table - Preserved for 100% Backward Compatibility)
+  ┌────────────────────────┬────────────────┬─────────────────────────────────────────────┐
+  │ Field                  │ Type           │ Details                                     │
+  ├────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+  │ id                     │ integer (PK)   │ Auto-incrementing primary key               │
+  │ token                  │ string (UK)    │ Unique UUID submission identifier           │
+  │ source_code            │ text           │ Transparently Base64-encoded user code      │
+  │ stdin, stdout, stderr  │ text           │ Input, output, and error streams            │
+  │ status_id              │ integer        │ Status ID (3=AC, 4=WA, 5=TLE, 6=CE, 11=RE)  │
+  │ time, memory           │ decimal, int   │ Execution CPU time and memory consumption   │
+  │ created_at             │ datetime (IDX) │ ★ Added B-tree index to stop table scans     │
+  └────────────────────────┴────────────────┴─────────────────────────────────────────────┘
 
-    SUITE_TEST_CASES {
-        int id PK
-        int suite_id FK
-        string token UK
-        text stdin
-        text expected_output
-        text stdout
-        text stderr
-        int status_id
-        decimal time
-        decimal wall_time
-        int memory
-        int exit_code
-        datetime created_at
-    }
+                                         ▲
+                                         │ Completely Isolated
+                                         ▼
 
-    SUITES ||--o{ SUITE_TEST_CASES : "1 suite compiles once and executes N test cases"
+  [ suites ] (Compile-Once Suite Domain Model)
+  ┌────────────────────────┬────────────────┬─────────────────────────────────────────────┐
+  │ Field                  │ Type           │ Details                                     │
+  ├────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+  │ id                     │ integer (PK)   │ Auto-incrementing primary key               │
+  │ token                  │ string (UK)    │ Unique UUID suite identifier                │
+  │ language_id            │ integer        │ Language ID (50=C, 54=C++, 62=Java, 71=Py) │
+  │ source_code            │ text           │ Transparently Base64-encoded source code    │
+  │ status_id              │ integer        │ Overall suite status (aggregates test cases)│
+  │ compile_output         │ text           │ Compiler warnings or syntax error log       │
+  │ cpu_time_limit         │ decimal        │ CPU limit per test case (default: 2.0s)     │
+  │ wall_time_limit        │ decimal        │ Wall limit per test case (default: 10.0s)   │
+  │ memory_limit           │ integer        │ Physical memory limit (default: 262144 KB)  │
+  │ callback_url           │ string         │ Optional webhook URL for live callbacks     │
+  │ created_at             │ datetime (IDX) │ ★ Indexed for automated pruning cleanup     │
+  └────────────────────────┴────────────────┴─────────────────────────────────────────────┘
+                                         │
+                                         │ 1 Suite has MANY (1..N) Test Cases
+                                         ▼
+  [ suite_test_cases ] (Per-Test Execution Telemetry)
+  ┌────────────────────────┬────────────────┬─────────────────────────────────────────────┐
+  │ Field                  │ Type           │ Details                                     │
+  ├────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+  │ id                     │ integer (PK)   │ Auto-incrementing primary key               │
+  │ suite_id               │ integer (FK)   │ Foreign key referencing suites(id)          │
+  │ token                  │ string (UK)    │ Unique UUID per individual test case        │
+  │ stdin, expected_output │ text           │ Inputs and expected outputs                 │
+  │ stdout, stderr         │ text           │ Program outputs and runtime errors          │
+  │ status_id              │ integer        │ Test case status (3=AC, 4=WA, 5=TLE, etc.)  │
+  │ time, wall_time        │ decimal        │ Isolated per-test CPU time and wall time    │
+  │ memory                 │ integer        │ Real physical RSS memory used in KB         │
+  │ exit_code, exit_signal │ integer        │ Process exit status and POSIX signal        │
+  │ created_at             │ datetime (IDX) │ ★ Indexed for efficient DB pruning          │
+  └────────────────────────┴────────────────┴─────────────────────────────────────────────┘
+====================================================================================================
 ```
 
 ---
