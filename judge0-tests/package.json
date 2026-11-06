@@ -1,0 +1,20 @@
+{
+  "name": "judge0-suite-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for Judge0 4-Language Suite Engine",
+  "main": "run-all.js",
+  "scripts": {
+    "test": "node run-all.js",
+    "test:load": "node load-test.js 5 25 20",
+    "test:stress": "node load-test.js 10 50 25",
+    "test:extreme": "node load-test.js 15 100 30",
+    "test:matrix": "node matrix-runner.js",
+    "test:suite": "node tests/test-suites.js",
+    "test:legacy": "node tests/test-legacy.js",
+    "test:callback": "node tests/test-callback.js",
+    "probe:callback-ip": "node tests/probe-callback-ip.js"
+  },
+  "keywords": ["judge0", "tests", "competitive-programming", "online-assessment"],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,124 @@
+{
+  "submissions": [
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "25700 -39953\n",
+      "expected_output": "-14253\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-46040 58194\n",
+      "expected_output": "12154\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "82749 -80575\n",
+      "expected_output": "2174\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-84306 -54281\n",
+      "expected_output": "-138587\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "50735 33513\n",
+      "expected_output": "84248\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-88429 937\n",
+      "expected_output": "-87492\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-95992 -77053\n",
+      "expected_output": "-173045\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-5365 56220\n",
+      "expected_output": "50855\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-27414 66621\n",
+      "expected_output": "39207\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-39351 31760\n",
+      "expected_output": "-7591\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-76664 -52905\n",
+      "expected_output": "-129569\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-30879 50510\n",
+      "expected_output": "19631\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-90142 -12249\n",
+      "expected_output": "-102391\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "62350 -40623\n",
+      "expected_output": "21727\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "73254 -27094\n",
+      "expected_output": "46160\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-93726 -91993\n",
+      "expected_output": "-185719\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-77198 -93596\n",
+      "expected_output": "-170794\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "34430 -92064\n",
+      "expected_output": "-57634\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "78019 46401\n",
+      "expected_output": "124420\n"
+    },
+    {
+      "source_code": "#include <iostream>\nusing namespace std;\nint main(){long long a,b;if(cin>>a>>b)cout<<a+b<<\"\\n\";return 0;}",
+      "language_id": 54,
+      "stdin": "-81972 -73044\n",
+      "expected_output": "-155016\n"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "submissions": [
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-99604 5791\n",
+      "expected_output": "-93813\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-88487 -88932\n",
+      "expected_output": "-177419\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-64245 63413\n",
+      "expected_output": "-832\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "98214 -96338\n",
+      "expected_output": "1876\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "36486 36922\n",
+      "expected_output": "73408\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-81949 -33673\n",
+      "expected_output": "-115622\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-21183 -75738\n",
+      "expected_output": "-96921\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "67997 -63910\n",
+      "expected_output": "4087\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "67667 99093\n",
+      "expected_output": "166760\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-6804 32085\n",
+      "expected_output": "25281\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-2464 65582\n",
+      "expected_output": "63118\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-96423 394\n",
+      "expected_output": "-96029\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-88802 -72206\n",
+      "expected_output": "-161008\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-65725 27693\n",
+      "expected_output": "-38032\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "68901 55547\n",
+      "expected_output": "124448\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "71558 -139\n",
+      "expected_output": "71419\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-89250 53821\n",
+      "expected_output": "-35429\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-48723 -14663\n",
+      "expected_output": "-63386\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-41637 90154\n",
+      "expected_output": "48517\n"
+    },
+    {
+      "source_code": "import sys\nparts = sys.stdin.read().split()\nif len(parts) >= 2:\n    print(int(parts[0]) + int(parts[1]))",
+      "language_id": 71,
+      "stdin": "-38226 -14563\n",
+      "expected_output": "-52789\n"
+    }
+  ]
+}
