@@ -28,7 +28,7 @@
     is_archived: false,
     source_file: "Main.java",
     compile_cmd: "/usr/bin/javac %s Main.java",
-    run_cmd: "/usr/bin/java -Xms32m -Xmx256m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 Main"
+    run_cmd: "/usr/bin/java -XX:ActiveProcessorCount=2 -Xms32m -Xmx256m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 Main"
   },
   {
     id: 71,
