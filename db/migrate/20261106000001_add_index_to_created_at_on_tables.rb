@@ -5,3 +5,4 @@ class AddIndexToCreatedAtOnTables < ActiveRecord::Migration[5.0]
     add_index :suite_test_cases, :created_at unless index_exists?(:suite_test_cases, :created_at)
   end
 end
+
