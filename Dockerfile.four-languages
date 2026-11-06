@@ -51,6 +51,9 @@ RUN useradd -u 1000 -m -r judge0 && \
 
 USER root
 
-ENV JUDGE0_VERSION="1.13.1-four"
+ENV JUDGE0_MAINTAINER="IWillPinchU"
+LABEL maintainer=$JUDGE0_MAINTAINER
+
+ENV JUDGE0_VERSION="1.2.0"
 LABEL version=$JUDGE0_VERSION
 
