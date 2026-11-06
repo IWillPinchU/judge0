@@ -1,5 +1,5 @@
 # Judge0 API Server & Worker - Lightweight 4-Language Edition (C, C++, Java, Python)
-ARG COMPILER_IMAGE=judge0-compilers-four:latest
+ARG COMPILER_IMAGE=iwillpinchu/judge0-compilers-four:v2-cgroup
 FROM ${COMPILER_IMAGE} AS production
 
 ENV JUDGE0_HOMEPAGE "https://judge0.com"
