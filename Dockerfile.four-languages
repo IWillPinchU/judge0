@@ -1,0 +1,52 @@
+# Judge0 API Server & Worker - Lightweight 4-Language Edition (C, C++, Java, Python)
+ARG COMPILER_IMAGE=judge0-compilers-four:latest
+FROM ${COMPILER_IMAGE} AS production
+
+ENV JUDGE0_HOMEPAGE "https://judge0.com"
+LABEL homepage=$JUDGE0_HOMEPAGE
+
+ENV JUDGE0_SOURCE_CODE "https://github.com/judge0/judge0"
+LABEL source_code=$JUDGE0_SOURCE_CODE
+
+ENV JUDGE0_LEAN_MODE="true"
+ENV PATH="/usr/bin:/usr/local/bin:$PATH"
+
+EXPOSE 2358
+
+WORKDIR /api
+
+# Install Ruby gems
+COPY Gemfile* ./
+RUN bundle config set --local without 'development' && \
+    bundle install --jobs=$(nproc)
+
+# Setup cron tasks
+COPY cron /etc/cron.d
+RUN if [ -d /etc/cron.d ] && [ "$(ls -A /etc/cron.d)" ]; then cat /etc/cron.d/* | crontab -; fi
+
+# Copy application code
+COPY . .
+
+# Install procps (ps, pgrep, top) required for process management
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends procps && \
+    rm -rf /var/lib/apt/lists/*
+
+# Fix Windows CRLF line endings and set execution permissions
+RUN sed -i 's/\r$//' /api/docker-entrypoint.sh /api/scripts/* && \
+    chmod +x /api/docker-entrypoint.sh /api/scripts/*
+
+ENTRYPOINT ["/api/docker-entrypoint.sh"]
+CMD ["/api/scripts/server"]
+
+# Setup non-root judge0 user with sudo permissions required by isolate
+RUN useradd -u 1000 -m -r judge0 && \
+    echo "judge0 ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+    mkdir -p /api/tmp && \
+    chown -R judge0: /api/tmp/
+
+USER judge0
+
+ENV JUDGE0_VERSION "1.13.1-four"
+LABEL version=$JUDGE0_VERSION
+

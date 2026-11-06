@@ -6,6 +6,10 @@ Rails.application.routes.draw do
     get 'batch', to: 'submissions#batch_show', on: :collection
   end
 
+  resources :suites, only: [:create, :show], param: :token do
+    get 'test_cases/:test_case_token', to: 'suites#show_test_case', on: :collection
+  end
+
   resources :languages, only: [:index, :show] do
     get 'all', to: 'languages#all', on: :collection
   end

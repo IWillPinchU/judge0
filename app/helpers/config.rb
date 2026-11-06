@@ -37,6 +37,7 @@ module Config
   MAX_EXTRACT_SIZE = (ENV["MAX_EXTRACT_SIZE"].presence || 10240).to_i
   ENABLE_BATCHED_SUBMISSIONS = ENV["ENABLE_BATCHED_SUBMISSIONS"] != "false"
   MAX_SUBMISSION_BATCH_SIZE = (ENV["MAX_SUBMISSION_BATCH_SIZE"].presence || 20).to_i
+  MAX_TEST_CASES_PER_SUITE = (ENV["MAX_TEST_CASES_PER_SUITE"].presence || 100).to_i
   SUBMISSION_CACHE_DURATION = (ENV["SUBMISSION_CACHE_DURATION"].presence || 1).to_f
   USE_DOCS_AS_HOMEPAGE = ENV["USE_DOCS_AS_HOMEPAGE"] == "true"
   ALLOW_ENABLE_NETWORK = ENV["ALLOW_ENABLE_NETWORK"] != "false"
@@ -80,6 +81,7 @@ module Config
       "max_extract_size": MAX_EXTRACT_SIZE,
       "enable_batched_submissions": ENABLE_BATCHED_SUBMISSIONS,
       "max_submission_batch_size": MAX_SUBMISSION_BATCH_SIZE,
+      "max_test_cases_per_suite": MAX_TEST_CASES_PER_SUITE,
       "submission_cache_duration": SUBMISSION_CACHE_DURATION,
       "use_docs_as_homepage": USE_DOCS_AS_HOMEPAGE,
       "allow_enable_network": ALLOW_ENABLE_NETWORK,

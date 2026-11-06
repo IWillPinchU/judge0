@@ -26,7 +26,7 @@ trap exit_gracefully SIGTERM SIGINT
 mkdir -p tmp/pids &> /dev/null
 while [[ $run_resque -eq 1 ]]; do
     echo "[$(date_now)] Starting scheduler."
-    if ! ps -p $scheduler_pid &> /dev/null; then
+    if ! kill -0 $scheduler_pid 2>/dev/null; then
         rake resque:scheduler &
         scheduler_pid=$!
     fi
@@ -35,6 +35,7 @@ while [[ $run_resque -eq 1 ]]; do
     echo "[$(date_now)] Starting workers."
     rails resque:workers &
     resque_pid=$!
-    while ps -p $resque_pid > /dev/null; do sleep 1s; done
+    while kill -0 $resque_pid 2>/dev/null; do sleep 1s; done
     echo "[$(date_now)] Workers are stopped."
+    sleep 2s
 done
