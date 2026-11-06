@@ -82,14 +82,14 @@ async function runBase64Tests() {
     logFail("base64_encoded=false failed", err.message);
   }
 
-  // Test 3: base64_encoded omitted (Verifying plaintext mode with DISABLE_IMPLICIT_BASE64_ENCODING=true)
+  // Test 3: base64_encoded omitted with base64 payload (Verifying default upstream Judge0 implicit base64 mode)
   total++;
   try {
     const rawCode = "print('B64_OMITTED_TEST')";
     const payload = {
-      source_code: rawCode,
+      source_code: toBase64(rawCode),
       language_id: LANGUAGES.PYTHON,
-      test_cases: [{ expected_output: "B64_OMITTED_TEST\n" }]
+      test_cases: [{ expected_output: toBase64("B64_OMITTED_TEST\n") }]
     };
 
     const res = await fetch(`${JUDGE0_URL}/suites?wait=true`, {
@@ -102,9 +102,10 @@ async function runBase64Tests() {
     const data = await res.json();
 
     assert.strictEqual(data.status?.id, STATUS.ACCEPTED);
-    assert.strictEqual(data.test_cases[0].stdout, "B64_OMITTED_TEST\n");
+    const decoded = fromBase64(data.test_cases[0].stdout);
+    assert.strictEqual(decoded, "B64_OMITTED_TEST\n");
 
-    logPass("base64_encoded omitted correctly defaults to plaintext when DISABLE_IMPLICIT_BASE64_ENCODING=true");
+    logPass("base64_encoded omitted correctly defaults to upstream Judge0 implicit base64 encoding mode");
     passed++;
   } catch (err) {
     logFail("base64_encoded omitted failed", err.message);
