@@ -15,7 +15,7 @@ async function runLanguageTests() {
 int main() {
     int a, b;
     if (scanf("%d %d", &a, &b) == 2) {
-        printf("%d\n", a * b);
+        printf("%d\\n", a * b);
     }
     return 0;
 }`,
@@ -34,6 +34,9 @@ int main() {
 
     assert.strictEqual(res.status, 201);
     const data = await res.json();
+    if (data.status?.id !== STATUS.ACCEPTED) {
+      console.log("C Debug Data:", JSON.stringify(data, null, 2));
+    }
     assert.strictEqual(data.status?.id, STATUS.ACCEPTED);
     assert.strictEqual(data.test_cases[0].stdout, "30\n");
     assert.strictEqual(data.test_cases[1].stdout, "56\n");
@@ -113,6 +116,9 @@ public class Main {
 
     assert.strictEqual(res.status, 201);
     const data = await res.json();
+    if (data.status?.id !== STATUS.ACCEPTED) {
+      console.log("C Debug Data:", JSON.stringify(data, null, 2));
+    }
     assert.strictEqual(data.status?.id, STATUS.ACCEPTED);
     assert.strictEqual(data.test_cases[0].stdout, "Java21:142\n");
 
@@ -144,6 +150,9 @@ print(int(np.dot(a, b)))`,
 
     assert.strictEqual(res.status, 201);
     const data = await res.json();
+    if (data.status?.id !== STATUS.ACCEPTED) {
+      console.log("C Debug Data:", JSON.stringify(data, null, 2));
+    }
     assert.strictEqual(data.status?.id, STATUS.ACCEPTED);
     assert.strictEqual(data.test_cases[0].stdout, "28\n");
 

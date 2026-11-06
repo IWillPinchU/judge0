@@ -1,7 +1,7 @@
 // Central Configuration for Judge0 Test Suite
 module.exports = {
-  // Judge0 Server API endpoint (VM)
-  JUDGE0_URL: process.env.JUDGE0_URL || "http://192.168.196.128:2358",
+  // Judge0 Server API endpoint (default: localhost:2358)
+  JUDGE0_URL: process.env.JUDGE0_URL || "http://localhost:2358",
 
   // Candidate Host IPs for Webhook Callbacks from the VM
   CALLBACK_CANDIDATE_IPS: [

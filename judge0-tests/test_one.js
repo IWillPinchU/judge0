@@ -1,7 +1,9 @@
 async function test() {
   console.log("Sending wait=true request...");
   const t0 = Date.now();
-  const res = await fetch("http://192.168.196.128:2358/suites?wait=true&base64_encoded=false", {
+  const config = require("./config");
+  const baseUrl = process.env.JUDGE0_URL || config.JUDGE0_URL || "http://localhost:2358";
+  const res = await fetch(`${baseUrl}/suites?wait=true&base64_encoded=false`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
