@@ -31,7 +31,7 @@ class SuiteSerializer < ActiveModel::Serializer
   def test_cases
     return nil if object.status_id == 6
 
-    object.suite_test_cases.collect do |tc|
+    object.suite_test_cases.order(:id).collect do |tc|
       SuiteTestCaseSerializer.new(
         tc,
         {

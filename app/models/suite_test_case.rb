@@ -1,5 +1,5 @@
 class SuiteTestCase < ApplicationRecord
-  belongs_to :suite
+  belongs_to :suite, inverse_of: :suite_test_cases
 
   before_create :generate_token
   before_validation :set_defaults

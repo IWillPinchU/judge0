@@ -1,5 +1,5 @@
 class Suite < ApplicationRecord
-  has_many :suite_test_cases, dependent: :destroy
+  has_many :suite_test_cases, dependent: :destroy, inverse_of: :suite
 
   validates :source_code, presence: true
   validates :language_id, presence: true
