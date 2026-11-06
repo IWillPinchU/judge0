@@ -224,9 +224,13 @@ class SuiteJob < ApplicationJob
       program_stderr = File.read(stderr_file)
       program_stderr = nil if program_stderr.empty?
 
-      test_case.time = metadata[:time]
-      test_case.wall_time = metadata[:"time-wall"]
-      test_case.memory = (cgroups.present? ? metadata[:"cg-mem"] : metadata[:"max-rss"])
+      test_case.time = metadata[:time].presence || "0.0"
+      test_case.wall_time = metadata[:"time-wall"].presence || "0.0"
+      test_case.memory = if cgroups.present? && metadata[:"cg-mem"].present? && metadata[:"cg-mem"].to_i > 0
+                           metadata[:"cg-mem"].to_i
+                         else
+                           metadata[:"max-rss"].to_i
+                         end
       test_case.stdout = program_stdout
       test_case.stderr = program_stderr
       test_case.exit_code = metadata[:exitcode].try(:to_i) || 0
