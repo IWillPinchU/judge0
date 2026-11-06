@@ -101,10 +101,5 @@ else
     echo "[entrypoint] cgroup v2 setup unavailable; isolate stays in rlimit mode (memory limits enforced as virtual address)"
 fi
 
-# Ensure isolate num_boxes is INT_MAX
-if [ -f /usr/local/etc/isolate ]; then
-    sed -i 's/^num_boxes\s*=.*/num_boxes = 2147483647/' /usr/local/etc/isolate 2>/dev/null || true
-fi
-
 cron
 exec "$@"
