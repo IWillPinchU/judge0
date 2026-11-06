@@ -2,10 +2,10 @@
 ARG COMPILER_IMAGE=iwillpinchu/judge0-compilers-four:v2-cgroup
 FROM ${COMPILER_IMAGE} AS production
 
-ENV JUDGE0_HOMEPAGE "https://judge0.com"
+ENV JUDGE0_HOMEPAGE="https://github.com/IWillPinchU/judge0"
 LABEL homepage=$JUDGE0_HOMEPAGE
 
-ENV JUDGE0_SOURCE_CODE "https://github.com/judge0/judge0"
+ENV JUDGE0_SOURCE_CODE="https://github.com/IWillPinchU/judge0"
 LABEL source_code=$JUDGE0_SOURCE_CODE
 
 ENV JUDGE0_LEAN_MODE="true"
@@ -51,6 +51,6 @@ RUN useradd -u 1000 -m -r judge0 && \
 
 USER root
 
-ENV JUDGE0_VERSION "1.13.1-four"
+ENV JUDGE0_VERSION="1.13.1-four"
 LABEL version=$JUDGE0_VERSION
 
