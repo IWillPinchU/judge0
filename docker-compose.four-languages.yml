@@ -7,12 +7,7 @@ x-logging:
 
 services:
   server:
-    build:
-      context: .
-      dockerfile: Dockerfile.four-languages
-      args:
-        COMPILER_IMAGE: judge0-compilers-four:latest
-    image: judge0-four:latest
+    image: iwillpinchu/judge0-four:v2-cgroup
     volumes:
       - ./judge0.four-languages.conf:/judge0.conf:ro
     ports:
@@ -27,12 +22,7 @@ services:
       - redis
 
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.four-languages
-      args:
-        COMPILER_IMAGE: judge0-compilers-four:latest
-    image: judge0-four:latest
+    image: iwillpinchu/judge0-four:v2-cgroup
     command: ["./scripts/workers"]
     volumes:
       - ./judge0.four-languages.conf:/judge0.conf:ro
