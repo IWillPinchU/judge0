@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: judge0-worker
+  namespace: judge0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: judge0-worker
+  template:
+    metadata:
+      labels:
+        app: judge0-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - judge0-worker
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: worker
+          image: iwillpinchu/judge0-four:v2-cgroup
+          command: ["/api/docker-entrypoint.sh"]
+          args: ["./scripts/workers"]
+          securityContext:
+            privileged: true
+          envFrom:
+            - configMapRef:
+                name: judge0-config
+            - secretRef:
+                name: judge0-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "8000m"
+              memory: "3584Mi"
+          volumeMounts:
+            - name: entrypoint-vol
+              mountPath: /api/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh
+            - name: suite-job-vol
+              mountPath: /api/app/jobs/suite_job.rb
+              subPath: suite_job.rb
+      volumes:
+        - name: entrypoint-vol
+          configMap:
+            name: entrypoint-script
+            defaultMode: 0755
+        - name: suite-job-vol
+          configMap:
+            name: suite-job-script
+            defaultMode: 0644

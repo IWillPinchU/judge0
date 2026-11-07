@@ -1,0 +1,16 @@
+{
+  "helpers": 8,
+  "totalDurationSec": 270.117,
+  "completedTestCases": 15000,
+  "completedSuites": 150,
+  "acceptedSuites": 150,
+  "failedSuites": 0,
+  "tcThroughput": 55.53,
+  "suiteThroughput": 0.56,
+  "minLatency": 12497,
+  "p50": 17222,
+  "p90": 23267,
+  "p95": 24065,
+  "p99": 29096,
+  "maxLatency": 29181
+}

@@ -183,6 +183,8 @@ class SuiteJob < ApplicationJob
     command_line_arguments = suite.command_line_arguments.to_s.strip.encode("UTF-8", invalid: :replace).gsub(/[$&;<>|`]/, "")
     File.open(run_script, "w") { |f| f.write("#{suite.language.run_cmd} #{command_line_arguments}") }
 
+    `sudo chmod -R 555 #{boxdir}`
+
     command = "isolate #{cgroups} \
     -s \
     -b #{box_id} \
@@ -208,6 +210,8 @@ class SuiteJob < ApplicationJob
 
     suite.suite_test_cases.order(:id).each do |test_case|
       test_case.update(started_at: DateTime.now)
+
+      `sudo rm -rf #{tmpdir}/*` if Dir.exist?(tmpdir)
 
       File.open(stdin_file, "wb") { |f| f.write(test_case.stdin) }
       initialize_file(stdout_file)
@@ -268,6 +272,7 @@ class SuiteJob < ApplicationJob
       })
     end
 
+    `sudo chmod -R 777 #{boxdir} 2>/dev/null`
     `sudo rm -f #{run_script}`
 
     first_non_ac = suite.suite_test_cases.where.not(status_id: Status.ac.id).first
@@ -288,6 +293,7 @@ class SuiteJob < ApplicationJob
     return unless boxdir && workdir && Dir.exist?(workdir)
 
     fix_permissions
+    `sudo chmod -R 777 #{boxdir} #{tmpdir} 2>/dev/null`
     `sudo rm -rf #{boxdir}/* #{tmpdir}/*`
     [stdin_file, stdout_file, stderr_file, metadata_file].compact.each do |f|
       `sudo rm -rf #{f}`

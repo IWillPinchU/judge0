@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: judge0-api
+  namespace: judge0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: judge0-api
+  template:
+    metadata:
+      labels:
+        app: judge0-api
+    spec:
+      containers:
+        - name: api
+          image: iwillpinchu/judge0-four:v2-cgroup
+          envFrom:
+            - configMapRef:
+                name: judge0-config
+            - secretRef:
+                name: judge0-secrets
+          ports:
+            - containerPort: 2358
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: judge0-api-service
+  namespace: judge0
+spec:
+  type: NodePort
+  selector:
+    app: judge0-api
+  ports:
+    - port: 2358
+      targetPort: 2358
+      nodePort: 32358
+

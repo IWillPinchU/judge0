@@ -1,0 +1,15 @@
+{
+  "helpers": 2,
+  "totalTests": 500,
+  "compilations": 500,
+  "totalDurationSec": 220.001,
+  "tcThroughput": 2.27,
+  "accepted": 500,
+  "failed": 0,
+  "minLatency": 613,
+  "p50": 11721,
+  "p90": 19755,
+  "p95": 20956,
+  "p99": 22791,
+  "maxLatency": 23438
+}

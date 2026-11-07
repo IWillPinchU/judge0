@@ -31,6 +31,14 @@ set -uo pipefail
 
 CG_SELF="$(awk -F: '$1 == "0" {print $3}' /proc/self/cgroup 2>/dev/null)"
 CG_ROOT="/sys/fs/cgroup${CG_SELF%/}"
+
+# In Kubernetes / containerd, CG_SELF is > 200 characters. Isolate 2.0 has a 256-byte
+# path buffer in cg_makepath, which asserts if path length reaches 256 bytes.
+# If CG_ROOT path exceeds 100 chars and root cgroup is writable, use /sys/fs/cgroup directly.
+if [ "${#CG_ROOT}" -gt 100 ] && [ -w "/sys/fs/cgroup/cgroup.subtree_control" ]; then
+    CG_ROOT="/sys/fs/cgroup"
+fi
+
 CG_PARENT_PROCS="$CG_ROOT/cgroup.procs"
 CG_PARENT_SUBTREE="$CG_ROOT/cgroup.subtree_control"
 CG_API_SCOPE="$CG_ROOT/api.scope"

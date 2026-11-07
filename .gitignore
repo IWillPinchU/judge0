@@ -7,3 +7,5 @@ tmp/*
 coverage/
 srv/
 environment
+k8s-lab/bin/
+
