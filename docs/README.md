@@ -9,6 +9,7 @@ Welcome to the documentation for the modernized **Judge0 Compile-Once Multi-Test
 | Document | Description |
 | :--- | :--- |
 | **[Architecture & Suite API](ARCHITECTURE.md)** | Full architectural specification: compile-once engine, cgroup v2 sandbox lifecycle, database schema, and CPU vs. Wall time watchdog mechanics. |
+| **[The Execution Dilemma](DILEMMA.md)** | CPU Time vs. Wall Time analysis, cgroup cumulative CPU accounting, partial scoring trade-offs, and TLE mitigation strategies. |
 | **[Benchmark & Scaling Report](BENCHMARKS.md)** | Empirical 93,000 sandboxed test cases benchmark across 6 worker tiers (COUNT = 2 to 24), Ryzen 5 5600X hardware analysis, and legacy comparison. |
 | **[Security & Exploit Hardening](SECURITY.md)** | Comprehensive sandbox security model: read-only `/box` (0555), scratchpad `/tmp` purging, binary tampering prevention, and automated audit suites. |
 | **[Implementation & Verification Report](IMPLEMENTATION_AND_VERIFICATION_REPORT.md)** | Milestone audit trail, bug root causes, and verification matrices. |
