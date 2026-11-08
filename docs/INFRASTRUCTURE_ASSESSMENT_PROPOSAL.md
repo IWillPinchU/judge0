@@ -135,7 +135,7 @@ flowchart TD
 #### **1. Benchmark Test Rig Specifications:**
 * **Host Processor:** 12 Logical CPU Threads (Intel/AMD x86_64)
 * **Host Memory:** 16 GB Physical RAM
-* **OS & Kernel:** Windows 11 host running WSL2 Linux Kernel (Ubuntu 22.04 LTS)
+* **OS & Kernel:** Windows 11 host running Docker Desktop on WSL2 Linux Kernel
 * **Orchestration:** KinD (Kubernetes-in-Docker) local cluster (`judge0-cluster`)
 * **Languages Tested:** C (GCC 12.2), C++20 (G++ 12.2), Java 21 (OpenJDK 21 LTS), Python 3.11 with NumPy
 * **Workload Evaluated:** **500 independent compilations & sandboxed executions** in 10 batches of 50 (Upstream API: `POST /submissions/batch`)
@@ -405,7 +405,7 @@ Instead of repeating source code 50 times in one flat table, the prototype norma
 #### **1. Benchmark Test Rig Specifications:**
 * **Host Processor:** 12 Logical CPU Threads (Intel/AMD x86_64)
 * **Host Memory:** 16 GB Physical RAM
-* **OS & Kernel:** Windows 11 host running WSL2 Linux Kernel (Ubuntu 22.04 LTS)
+* **OS & Kernel:** Windows 11 host running Docker Desktop on WSL2 Linux Kernel
 * **Orchestration:** KinD (Kubernetes-in-Docker) local cluster (`judge0-cluster`)
 * **Total Volume in Study:** **93,000 sandboxed test executions** across 12 full runs with a 100% Accepted pass rate.
 * **Languages Tested:** C (GCC 12.2), C++20 (G++ 12.2), Java 21 (OpenJDK 21 LTS), Python 3.11 with NumPy.
