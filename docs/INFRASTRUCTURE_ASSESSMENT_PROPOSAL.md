@@ -273,27 +273,60 @@ flowchart TD
 
 ---
 
-## Slide 8: Baseline Azure Infrastructure Sizing Matrix (Upstream Judge0)
+## Slide 8: Enterprise Azure Architecture & Sizing Matrix (Upstream Judge0)
 
-*Workload: 100 candidates $\times$ 50 test cases = **5,000 independent compilations & runs***  
+*Workload Profile: 100 simultaneous candidates $\times$ 50 test cases = **5,000 independent compilations & runs***  
 *Throughput Rule of Thumb for Upstream: **1 vCPU core $\approx$ 0.65 test cases/sec***
 
-| Target Clear SLA | Max Candidate Wait | Required vCPUs | Azure VM Setup (F-series) |
-| :---: | :---: | :---: | :--- |
-| **1 Minute** | ~60 sec | **~128 vCPUs** | 8 $\times$ `Standard_F16s_v2` |
-| **2 Minutes** | ~2 min | **~64 vCPUs** | 4 $\times$ `Standard_F16s_v2` |
-| **3 Minutes** | ~3 min | **~44 vCPUs** | 3 $\times$ `Standard_F16s_v2` |
-| **4 Minutes** | ~4 min | **~32 vCPUs** | 2 $\times$ `Standard_F16s_v2` |
-| **5 Minutes** | ~5 min | **~24 vCPUs** | 3 $\times$ `Standard_F8s_v2` |
-| **Budget Tier** | **15–20+ min** | **4–8 vCPUs** | 1 $\times$ `Standard_F4s_v2` / `F8s_v2` |
+---
 
-#### **Supporting Azure Managed Services (Required for all tiers):**
-* **Database:** Azure Database for PostgreSQL Flexible Server (`Standard_D2ds_v5` with Premium SSD v2).
-* **Job Queue:** Azure Cache for Redis (`Standard C2: 2.5 GB`).
-* **API / Gateway:** Azure Application Gateway v2 + 2 $\times$ `Standard_B2s` / `D2s_v5` API instances.
+### 1. Fixed Enterprise Platform Foundation (Always-On Baseline)
+These core managed Azure services provide database durability, queue resilience, SSL ingress, and cluster orchestration. They remain active 24/7 regardless of exam traffic:
+
+| Azure Service | SKU / Configuration | Role in Architecture | Est. Monthly Cost |
+| :--- | :--- | :--- | :---: |
+| **Azure Application Gateway v2** | Standard v2 (Autoscaling 1–5 units) | SSL/TLS termination, rate limiting, and AKS Ingress (AGIC) | ~$175 / mo |
+| **AKS System Node Pool** | 2 $\times$ `Standard_D2s_v5` (4 vCPUs, 16 GB) | Hosts stateless Rails API pods, CoreDNS, and ingress controllers | ~$140 / mo |
+| **Azure DB for PostgreSQL** | Flexible Server `Standard_D2ds_v5` (Premium SSD v2) | Persistent ACID submission records, languages seed, automated backups | ~$135 / mo |
+| **Azure Cache for Redis** | Standard C2 (2.5 GB, High Availability Master/Replica)| Central Resque job queue and telemetry cache | ~$80 / mo |
+| **Azure Container Registry (ACR)**| Standard Tier | Secure private storage of compiler & worker container images | ~$20 / mo |
+| **Azure Monitor & Log Analytics** | Container Insights (5 GB data ingestion) | Centralized stdout/stderr logging, pod metrics, and alerting | ~$30 / mo |
+| **KEDA Event-driven Scaler** | **Native Managed AKS Add-on** | Scales worker pods based on real-time Redis queue depth | **$0.00 (FREE)** |
+| **AKS Cluster Autoscaler** | **Native Built-in AKS Engine** | Automatically provisions/deprovisions VM nodes on demand | **$0.00 (FREE)** |
+| **Baseline Platform Subtotal** | **Core Foundation (Always-On)** | **Enterprise Reliability & High-Availability Baseline** | **~$580 / month** |
+
+---
+
+### 2. Elastic Worker Compute Pool Sizing (Upstream Judge0 Engine)
+Workers run on a dedicated AKS node pool with compute-optimized F-series VMs (`Standard_F16s_v2` @ ~$0.67/hr per VM). 
+* **Elastic Cost Model:** Thanks to **KEDA + AKS Cluster Autoscaler (both $0)**, worker VMs only run during active assessment windows and terminate automatically when the queue empties.
+
+| Target Clear SLA | Max Candidate Wait | Required vCPUs | Azure Dedicated Node Pool Setup | Active Hourly Cost | 24/7 Cost (Reference) |
+| :---: | :---: | :---: | :--- | :---: | :---: |
+| **1 Minute** | ~60 sec | **~128 vCPUs** | **8 $\times$ `Standard_F16s_v2`** (Tainted Compute Pool) | **~$5.40 / hr** | ~$3,920 / mo |
+| **2 Minutes** | ~2 min | **~64 vCPUs** | **4 $\times$ `Standard_F16s_v2`** (Tainted Compute Pool) | **~$2.70 / hr** | ~$1,960 / mo |
+| **3 Minutes** | ~3 min | **~44 vCPUs** | **3 $\times$ `Standard_F16s_v2`** (Tainted Compute Pool) | **~$2.00 / hr** | ~$1,470 / mo |
+| **4 Minutes** | ~4 min | **~32 vCPUs** | **2 $\times$ `Standard_F16s_v2`** (Tainted Compute Pool) | **~$1.35 / hr** | ~$980 / mo |
+| **5 Minutes** | ~5 min | **~24 vCPUs** | **3 $\times$ `Standard_F8s_v2`** (Tainted Compute Pool) | **~$1.02 / hr** | ~$735 / mo |
+| **Budget Tier** | **15–20+ min** | **4–8 vCPUs** | **1 $\times$ `Standard_F4s_v2` / `F8s_v2`** | **~$0.34 / hr** | ~$245 / mo |
+
+---
+
+### 3. Key Financial & Operational Insights for Stakeholders:
+1. **Zero-Cost Elastic Autoscaling:** KEDA and the AKS Cluster Autoscaler are native, free features. We pay zero software licensing fees—we strictly pay for VM compute seconds during live tests.
+2. **Predictable Base Budget:** The platform foundation is **fixed at ~$580/month**. 
+3. **Pay-Per-Assessment Efficiency:** For a 2-hour assessment requiring a strict **2-Minute SLA** (4 $\times$ F16s_v2), the total compute cost is just **$5.40 for the entire exam** ($2.70/hr $\times$ 2 hrs).
+
+---
 
 ### Speaker Notes / Talking Points:
-> *"Here is the baseline infrastructure requirement for upstream Judge0 to support a 100-candidate test. Because each test case compiles from scratch, 1 vCPU gives us about 0.65 test cases per second. If our business SLA requires all candidates to receive their verdict within 2 minutes, we need approximately 64 vCPUs—for instance, 4 Standard_F16s VMs. If our target is a 4-minute wait time, we can manage on 32 vCPUs. However, if we allocate only 4 to 8 vCPUs, queue drain time stretches to 15 to 20 minutes, which presents a significant operational risk during live exams. Our primary decision is: what is our acceptable candidate wait-time SLA?"*
+> *"Let’s look at the complete financial and infrastructure picture on Azure. To give full transparency to leadership, we divide our costs into two distinct buckets:*
+>
+> * **First, the Fixed Platform Foundation:** This costs approximately **$580 per month**. It covers our managed Azure Postgres database, Azure Cache for Redis, the AKS system node pool running our API, Azure Application Gateway for SSL ingress, and Azure Container Registry. Notice that both **KEDA** (our queue-based scaler) and the **AKS Cluster Autoscaler** are **completely free** built-in features on Azure.
+> * **Second, the Elastic Worker Compute Pool:** This is where we choose our candidate wait-time SLA. Because upstream Judge0 recompiles code on every single test case, 1 vCPU clears about 0.65 test cases per second. 
+>   * If our business SLA demands that 100 students get their verdicts within **2 minutes**, we need **64 vCPUs** (4 Standard_F16s VMs).
+>   * If a **4-minute wait** is acceptable, we need **32 vCPUs** (2 Standard_F16s VMs).
+> * **The Key Takeaway for the CFO:** Because our dedicated worker node pool scales elastically to zero via KEDA, we do not need to run these compute VMs 24/7. For a 2-hour coding test with a 2-minute SLA, the actual compute cost is only **$5.40 for the entire exam**. The primary architectural decision for leadership is simply: what is our acceptable candidate wait-time SLA?"*
 
 ---
 
