@@ -61,3 +61,4 @@ volumes:
     name: judge0_postgres_data
   redis-data:
     name: judge0_redis_data
+

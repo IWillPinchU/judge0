@@ -3,11 +3,7 @@ class SuiteJob < ApplicationJob
 
   queue_as :default
 
-  STDIN_FILE_NAME = "stdin.txt"
-  STDOUT_FILE_NAME = "stdout.txt"
-  STDERR_FILE_NAME = "stderr.txt"
-  METADATA_FILE_NAME = "metadata.txt"
-  ADDITIONAL_FILES_ARCHIVE_FILE_NAME = "additional_files.zip"
+  include SandboxExecutable
 
   attr_reader :suite, :cgroups,
               :box_id, :workdir, :boxdir, :tmpdir,
@@ -55,11 +51,6 @@ class SuiteJob < ApplicationJob
     File.open(source_file, "wb") { |f| f.write(suite.source_code) } unless suite.is_project
 
     extract_archive
-  end
-
-  def initialize_file(file)
-    FileUtils.touch(file)
-    File.chmod(0666, file)
   end
 
   def extract_archive
@@ -302,14 +293,6 @@ class SuiteJob < ApplicationJob
     raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exist?(workdir)
   end
 
-  def reset_metadata_file
-    FileUtils.rm_f(metadata_file)
-    initialize_file(metadata_file)
-  end
-
-  def fix_permissions
-    FileUtils.chmod_R(0777, boxdir) rescue nil
-  end
 
   def reset_cgroup
     return unless cgroups.present? && box_id
@@ -338,38 +321,6 @@ class SuiteJob < ApplicationJob
       end
     end
   rescue Exception => e
-  end
-
-  def get_metadata
-    metadata = File.read(metadata_file).split("\n").collect do |e|
-      { e.split(":").first.to_sym => e.split(":")[1..-1].join(":") }
-    end.reduce({}, :merge)
-    metadata || {}
-  rescue Exception
-    {}
-  end
-
-  def determine_status(status, exit_signal, expected_output, stdout)
-    if status == "TO"
-      Status.tle
-    elsif status == "SG"
-      Status.find_runtime_error_by_status_code(exit_signal)
-    elsif status == "RE"
-      Status.nzec
-    elsif status == "XX"
-      Status.boxerr
-    elsif expected_output.nil? || strip(expected_output) == strip(stdout)
-      Status.ac
-    else
-      Status.wa
-    end
-  end
-
-  def strip(text)
-    return nil unless text
-    text.split("\n").collect(&:rstrip).join("\n").rstrip
-  rescue ArgumentError
-    text
   end
 end
 

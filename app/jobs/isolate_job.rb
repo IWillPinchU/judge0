@@ -3,11 +3,7 @@ class IsolateJob < ApplicationJob
 
   queue_as :fast
 
-  STDIN_FILE_NAME = "stdin.txt"
-  STDOUT_FILE_NAME = "stdout.txt"
-  STDERR_FILE_NAME = "stderr.txt"
-  METADATA_FILE_NAME = "metadata.txt"
-  ADDITIONAL_FILES_ARCHIVE_FILE_NAME = "additional_files.zip"
+  include SandboxExecutable
 
   attr_reader :submission, :cgroups,
               :box_id, :workdir, :boxdir, :tmpdir,
@@ -72,11 +68,6 @@ class IsolateJob < ApplicationJob
     File.open(stdin_file, "wb") { |f| f.write(submission.stdin) }
 
     extract_archive
-  end
-
-  def initialize_file(file)
-    FileUtils.touch(file)
-    File.chmod(0666, file)
   end
 
   def extract_archive
@@ -296,15 +287,6 @@ class IsolateJob < ApplicationJob
     raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exists?(workdir)
   end
 
-  def reset_metadata_file
-    FileUtils.rm_f(metadata_file)
-    initialize_file(metadata_file)
-  end
-
-  def fix_permissions
-    FileUtils.chmod_R(0777, boxdir) rescue nil
-  end
-
   def call_callback
     return unless submission.callback_url.present?
 
@@ -332,35 +314,5 @@ class IsolateJob < ApplicationJob
       end
     end
   rescue Exception => e
-  end
-
-  def get_metadata
-    metadata = File.read(metadata_file).split("\n").collect do |e|
-      { e.split(":").first.to_sym => e.split(":")[1..-1].join(":") }
-    end.reduce({}, :merge)
-    return metadata
-  end
-
-  def determine_status(status, exit_signal)
-    if status == "TO"
-      return Status.tle
-    elsif status == "SG"
-      return Status.find_runtime_error_by_status_code(exit_signal)
-    elsif status == "RE"
-      return Status.nzec
-    elsif status == "XX"
-      return Status.boxerr
-    elsif submission.expected_output.nil? || strip(submission.expected_output) == strip(submission.stdout)
-      return Status.ac
-    else
-      return Status.wa
-    end
-  end
-
-  def strip(text)
-    return nil unless text
-    text.split("\n").collect(&:rstrip).join("\n").rstrip
-  rescue ArgumentError
-    return text
   end
 end

@@ -37,3 +37,4 @@ CMD ["/api/scripts/server"]
 
 ENV JUDGE0_VERSION="1.2.0-hardened"
 LABEL version=$JUDGE0_VERSION
+
