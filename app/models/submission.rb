@@ -233,6 +233,8 @@ class Submission < ApplicationRecord
 
   def set_defaults
     self.status ||= Status.queue
+    self.queued_at ||= DateTime.now
+    self.queue_host ||= ENV["HOSTNAME"]
     self.number_of_runs ||= Config::NUMBER_OF_RUNS
     self.cpu_time_limit ||= Config::CPU_TIME_LIMIT
     self.cpu_extra_time ||= Config::CPU_EXTRA_TIME

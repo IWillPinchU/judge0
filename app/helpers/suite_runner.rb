@@ -35,7 +35,6 @@ module SuiteRunner
   end
 
   def self.perform_later(suite)
-    suite.update(status: Status.queue, queued_at: DateTime.now, queue_host: ENV["HOSTNAME"])
     target_queue = suite.suite_test_cases.size <= Config::FAST_QUEUE_THRESHOLD ? :fast : :default
     SuiteJob.set(queue: target_queue).perform_later(suite.id)
   end
