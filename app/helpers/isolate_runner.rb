@@ -1,9 +1,10 @@
 module IsolateRunner
   MAX_WAIT_TIME_S = 600
 
-  INITIAL_WAIT_TIME_S = 2
-  NEXT_WAIT_TIME_S = 1
-  WAIT_TIME_FACTOR_S = 0.5
+  INITIAL_WAIT_TIME_S = 0.05
+  NEXT_WAIT_TIME_S = 0.1
+  WAIT_TIME_FACTOR_S = 0.1
+  MAX_SLEEP_S = 0.5
 
   WAITING_STATUSES = [Status.queue.id, Status.process.id, nil]
 
@@ -16,12 +17,12 @@ module IsolateRunner
     (0..).each do |i|
       break if total_wait_time >= MAX_WAIT_TIME_S
 
-      if i == 0 then
+      if i == 0
         wait_time = INITIAL_WAIT_TIME_S
-      elsif i == 1 then
+      elsif i == 1
         wait_time = NEXT_WAIT_TIME_S
       else
-        wait_time = WAIT_TIME_FACTOR_S * i
+        wait_time = [WAIT_TIME_FACTOR_S * i, MAX_SLEEP_S].min
       end
 
       sleep(wait_time)
