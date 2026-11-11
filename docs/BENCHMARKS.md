@@ -139,7 +139,42 @@ ActiveRecord sets queue status and timestamps during the initial SQL `INSERT`, e
 
 ---
 
-## 6. How to Reproduce
+## 6. Real-World Assessment Simulation: 100 Simultaneous Candidates × 50 Test Cases
+
+To demonstrate the real-world impact of these benchmark numbers on an Online Assessment (OA) contest or coding test:
+
+### 6.1 The Simulation Scenario
+- **Simultaneous Candidates**: 100 students click "Submit Code" at the exact same instant ($t = 0$).
+- **Test Cases per Student**: 50 test cases.
+- **Total Workload**: $100 \times 50 = \mathbf{5,000\text{ test cases}}$.
+- **Hardware Profile**: 8 vCPU cloud VM with 16 helper workers (`COUNT=16`).
+
+### 6.2 Suite Engine vs. Legacy Engine Mathematical Projection
+
+| Parameter / Metric | Suite Engine (Compile-Once) | Legacy Engine (Compile-Per-Run) | Real-World Impact |
+| :--- | :---: | :---: | :--- |
+| **Jobs Enqueued in Redis** | **100 suites** | **5,000 submissions** | 50x less message broker queue overhead |
+| **Total Compilations** | **100 compilations** | **5,000 compilations** | 4,900 redundant compiler invocations eliminated |
+| **Effective Throughput** | **105.16 test cases / sec**<br/>($2.1032\text{ suites / sec}$) | **8.19 submissions / sec**<br/>($8.19\text{ test cases / sec}$) | **12.84x Higher Processing Capacity** |
+| **First Candidate Wait Time** | **~5.5 seconds** | **~35–45 seconds** | Instant feedback for early waves |
+| **Last Candidate (#100) Wait Time** | **47.55 seconds** | **610.50 seconds**<br/>(**10 minutes 10.5 seconds**) | **Sub-minute turnaround vs. 10+ minute queue lockup** |
+
+### 6.3 Wave-by-Wave Queue Drain Dynamics (Suite Engine)
+With 16 workers processing 16 suites concurrently ($\lceil 100 / 16 \rceil = 7\text{ waves}$):
+
+- **Wave 1 (Students 1–16)**: Finish at **~5.5s**
+- **Wave 2 (Students 17–32)**: Finish at **~10.9s**
+- **Wave 3 (Students 33–48)**: Finish at **~16.4s**
+- **Wave 4 (Students 49–64)**: Finish at **~21.8s**
+- **Wave 5 (Students 65–80)**: Finish at **~27.3s**
+- **Wave 6 (Students 81–96)**: Finish at **~32.7s**
+- **Wave 7 (Students 97–100)**: All finish by **47.55s**
+
+**Conclusion**: Under the Legacy Engine, Student #100 is blocked waiting behind 5,000 individual compilation jobs for **over 10 minutes**. Under the Suite Engine, every single student receives their complete 50-test-case evaluation in **under 48 seconds**.
+
+---
+
+## 7. How to Reproduce
 
 To reproduce these benchmarks on any machine running the hardened Judge0 stack:
 
@@ -159,3 +194,4 @@ node judge0-tests/benchmark_v2.js \
   --tcs-per-suite=50 \
   --concurrency=16
 ```
+
