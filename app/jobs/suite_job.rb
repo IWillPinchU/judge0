@@ -279,27 +279,13 @@ class SuiteJob < ApplicationJob
     })
   end
 
-  def cleanup(raise_exception = true)
-    return unless boxdir && workdir && Dir.exist?(workdir)
-
-    fix_permissions
-    FileUtils.chmod_R(0777, [boxdir, tmpdir]) rescue nil
-    FileUtils.rm_rf(Dir.glob("#{boxdir}/*"))
-    FileUtils.rm_rf(Dir.glob("#{tmpdir}/*"))
-    [stdin_file, stdout_file, stderr_file, metadata_file].compact.each do |f|
-      FileUtils.rm_rf(f)
-    end
-    `isolate #{cgroups} -b #{box_id} --cleanup` if box_id
-    raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exist?(workdir)
-  end
-
-
   def reset_cgroup
     return unless cgroups.present? && box_id
-    cg_root = (File.read("/run/isolate/cgroup").strip rescue "/sys/fs/cgroup/isolate.slice")
-    box_cg = "#{cg_root}/box-#{box_id}"
+    @cg_root ||= (File.read("/run/isolate/cgroup").strip rescue "/sys/fs/cgroup/isolate.slice")
+    box_cg = "#{@cg_root}/box-#{box_id}"
     if Dir.exist?(box_cg)
-      `rmdir #{box_cg} 2>/dev/null && mkdir #{box_cg} 2>/dev/null`
+      Dir.rmdir(box_cg) rescue nil
+      Dir.mkdir(box_cg) rescue nil
     end
   end
 

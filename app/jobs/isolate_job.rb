@@ -278,15 +278,6 @@ class IsolateJob < ApplicationJob
     end
   end
 
-  def cleanup(raise_exception = true)
-    fix_permissions
-    FileUtils.rm_rf(Dir.glob("#{boxdir}/*"))
-    FileUtils.rm_rf(Dir.glob("#{tmpdir}/*"))
-    FileUtils.rm_rf([stdin_file, stdout_file, stderr_file, metadata_file])
-    `isolate #{cgroups} -b #{box_id} --cleanup`
-    raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exists?(workdir)
-  end
-
   def call_callback
     return unless submission.callback_url.present?
 

@@ -20,7 +20,18 @@ module SandboxExecutable
   end
 
   def fix_permissions
-    FileUtils.chmod_R(0777, boxdir) rescue nil
+    FileUtils.chmod_R(0777, [boxdir, tmpdir].compact) rescue nil
+  end
+
+  def cleanup(raise_exception = true)
+    return unless try(:boxdir).present? && try(:workdir).present? && Dir.exist?(workdir)
+
+    fix_permissions
+    FileUtils.rm_rf(Dir.glob("#{boxdir}/*"))
+    FileUtils.rm_rf(Dir.glob("#{tmpdir}/*")) if try(:tmpdir).present?
+    FileUtils.rm_rf([stdin_file, stdout_file, stderr_file, metadata_file].compact)
+    `isolate #{cgroups} -b #{box_id} --cleanup` if try(:box_id).present?
+    raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exist?(workdir)
   end
 
   def get_metadata
