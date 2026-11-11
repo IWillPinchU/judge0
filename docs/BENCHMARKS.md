@@ -174,7 +174,38 @@ With 16 workers processing 16 suites concurrently ($\lceil 100 / 16 \rceil = 7\t
 
 ---
 
-## 7. How to Reproduce
+## 7. Cloud Sizing & vCPU Capacity Matrix (100 Candidates × 50 Test Cases)
+
+Based on the empirical per-vCPU throughput measured during the benchmark:
+- **Suite Engine Throughput**: $105.16\text{ tc/s}$ on 8 vCPUs $\to$ **$13.1450\text{ tc/s}$ per vCPU**.
+- **Legacy Engine Throughput**: $8.19\text{ sub/s}$ on 8 vCPUs $\to$ **$1.02375\text{ sub/s}$ per vCPU**.
+
+To complete the burst evaluation of 100 simultaneous submissions (5,000 total test cases) within a specified maximum student wait time ($T_{\text{target}}$):
+
+$$\text{Required Throughput } Q_{\text{req}} = \frac{5,000\text{ test cases}}{T_{\text{target}}\text{ (seconds)}}$$
+$$\text{Required vCPUs} = \frac{Q_{\text{req}}}{\text{Throughput per vCPU}}$$
+
+### vCPU Sizing Table
+
+| Target Max Wait Time | Required Total Throughput | Suite Engine (Compile-Once) | Legacy Engine (Compile-Per-Run) | Standard Cloud Provisioning (Suite vs. Legacy) |
+| :---: | :---: | :---: | :---: | :---: |
+| **1 Minute** *(60s)* | $83.3333\text{ tc/s}$ | **6.3395 vCPUs** | **81.4001 vCPUs** | **8 vCPUs** vs. **96 vCPUs** *(12.0x difference)* |
+| **2 Minutes** *(120s)* | $41.6667\text{ tc/s}$ | **3.1698 vCPUs** | **40.7000 vCPUs** | **4 vCPUs** vs. **48 vCPUs** *(12.0x difference)* |
+| **3 Minutes** *(180s)* | $27.7778\text{ tc/s}$ | **2.1132 vCPUs** | **27.1334 vCPUs** | **4 vCPUs** vs. **32 vCPUs** *(8.0x difference)* |
+| **4 Minutes** *(240s)* | $20.8333\text{ tc/s}$ | **1.5849 vCPUs** | **20.3500 vCPUs** | **2 vCPUs** vs. **32 vCPUs** *(16.0x difference)* |
+| **5 Minutes** *(300s)* | $16.6667\text{ tc/s}$ | **1.2679 vCPUs** | **16.2800 vCPUs** | **2 vCPUs** vs. **32 vCPUs** *(16.0x difference)* |
+
+### Infrastructure Planning Takeaways:
+1. **Sub-1-Minute SLA**:
+   - The Suite Engine guarantees complete sub-1-minute evaluation ($47.55\text{s}$) on a single cost-effective **8 vCPU VM**.
+   - The Legacy Engine requires a **96 vCPU enterprise-grade instance** (e.g., AWS `c6i.24xlarge` / Azure `F96s_v2`) to achieve the same 1-minute turnaround.
+2. **5-Minute SLA**:
+   - The Suite Engine comfortably executes on an entry-level **2 vCPU instance** (e.g., AWS `c6i.large`).
+   - The Legacy Engine still demands a **32 vCPU instance** (e.g., AWS `c6i.8xlarge`) due to 5,000 un-amortized compiler and container invocations.
+
+---
+
+## 8. How to Reproduce
 
 To reproduce these benchmarks on any machine running the hardened Judge0 stack:
 
