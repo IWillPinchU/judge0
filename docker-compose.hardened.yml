@@ -29,7 +29,7 @@ services:
     privileged: true
     environment:
       - JUDGE0_LEAN_MODE=true
-      - COUNT=2
+      - COUNT=16
     <<: *default-logging
     restart: always
     depends_on:
