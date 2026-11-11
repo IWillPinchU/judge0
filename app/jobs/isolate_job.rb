@@ -75,7 +75,8 @@ class IsolateJob < ApplicationJob
   end
 
   def initialize_file(file)
-    `sudo touch #{file} && sudo chown $(whoami): #{file}`
+    FileUtils.touch(file)
+    File.chmod(0666, file)
   end
 
   def extract_archive
@@ -175,9 +176,7 @@ class IsolateJob < ApplicationJob
 
     files_to_remove = [compile_output_file]
     files_to_remove << compile_script unless submission.is_project
-    files_to_remove.each do |f|
-      `sudo rm -rf #{f}`
-    end
+    FileUtils.rm_rf(files_to_remove)
 
     return :success if process_status.success?
 
@@ -245,7 +244,7 @@ class IsolateJob < ApplicationJob
 
     `#{command}`
 
-    `sudo rm #{run_script}` unless submission.is_project
+    FileUtils.rm_f(run_script) unless submission.is_project
   end
 
   def verify
@@ -290,21 +289,20 @@ class IsolateJob < ApplicationJob
 
   def cleanup(raise_exception = true)
     fix_permissions
-    `sudo rm -rf #{boxdir}/* #{tmpdir}/*`
-    [stdin_file, stdout_file, stderr_file, metadata_file].each do |f|
-      `sudo rm -rf #{f}`
-    end
+    FileUtils.rm_rf(Dir.glob("#{boxdir}/*"))
+    FileUtils.rm_rf(Dir.glob("#{tmpdir}/*"))
+    FileUtils.rm_rf([stdin_file, stdout_file, stderr_file, metadata_file])
     `isolate #{cgroups} -b #{box_id} --cleanup`
     raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exists?(workdir)
   end
 
   def reset_metadata_file
-    `sudo rm -rf #{metadata_file}`
+    FileUtils.rm_f(metadata_file)
     initialize_file(metadata_file)
   end
 
   def fix_permissions
-    `sudo chown -R $(whoami): #{boxdir}`
+    FileUtils.chmod_R(0777, boxdir) rescue nil
   end
 
   def call_callback

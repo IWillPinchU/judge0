@@ -58,7 +58,8 @@ class SuiteJob < ApplicationJob
   end
 
   def initialize_file(file)
-    `sudo touch #{file} && sudo chown $(whoami): #{file}`
+    FileUtils.touch(file)
+    File.chmod(0666, file)
   end
 
   def extract_archive
@@ -139,9 +140,7 @@ class SuiteJob < ApplicationJob
     reset_metadata_file
 
     files_to_remove = [compile_output_file, compile_script]
-    files_to_remove.each do |f|
-      `sudo rm -rf #{f}`
-    end
+    FileUtils.rm_rf(files_to_remove)
 
     if process_status.success?
       suite.update(status: Status.process)
@@ -183,7 +182,7 @@ class SuiteJob < ApplicationJob
     command_line_arguments = suite.command_line_arguments.to_s.strip.encode("UTF-8", invalid: :replace).gsub(/[$&;<>|`]/, "")
     File.open(run_script, "w") { |f| f.write("#{suite.language.run_cmd} #{command_line_arguments}") }
 
-    `sudo chmod -R 555 #{boxdir}`
+    FileUtils.chmod_R(0555, boxdir) rescue nil
 
     command = "isolate #{cgroups} \
     -s \
@@ -211,7 +210,7 @@ class SuiteJob < ApplicationJob
     suite.suite_test_cases.order(:id).each do |test_case|
       test_case.update(started_at: DateTime.now)
 
-      `sudo rm -rf #{tmpdir}/*` if Dir.exist?(tmpdir)
+      FileUtils.rm_rf(Dir.glob("#{tmpdir}/*")) if Dir.exist?(tmpdir)
 
       File.open(stdin_file, "wb") { |f| f.write(test_case.stdin) }
       initialize_file(stdout_file)
@@ -272,8 +271,8 @@ class SuiteJob < ApplicationJob
       })
     end
 
-    `sudo chmod -R 777 #{boxdir} 2>/dev/null`
-    `sudo rm -f #{run_script}`
+    FileUtils.chmod_R(0777, boxdir) rescue nil
+    FileUtils.rm_f(run_script)
 
     first_non_ac = suite.suite_test_cases.where.not(status_id: Status.ac.id).first
     suite.status = first_non_ac ? first_non_ac.status : Status.ac
@@ -293,22 +292,23 @@ class SuiteJob < ApplicationJob
     return unless boxdir && workdir && Dir.exist?(workdir)
 
     fix_permissions
-    `sudo chmod -R 777 #{boxdir} #{tmpdir} 2>/dev/null`
-    `sudo rm -rf #{boxdir}/* #{tmpdir}/*`
+    FileUtils.chmod_R(0777, [boxdir, tmpdir]) rescue nil
+    FileUtils.rm_rf(Dir.glob("#{boxdir}/*"))
+    FileUtils.rm_rf(Dir.glob("#{tmpdir}/*"))
     [stdin_file, stdout_file, stderr_file, metadata_file].compact.each do |f|
-      `sudo rm -rf #{f}`
+      FileUtils.rm_rf(f)
     end
     `isolate #{cgroups} -b #{box_id} --cleanup` if box_id
     raise "Cleanup of sandbox #{box_id} failed." if raise_exception && Dir.exist?(workdir)
   end
 
   def reset_metadata_file
-    `sudo rm -rf #{metadata_file}`
+    FileUtils.rm_f(metadata_file)
     initialize_file(metadata_file)
   end
 
   def fix_permissions
-    `sudo chown -R $(whoami): #{boxdir}`
+    FileUtils.chmod_R(0777, boxdir) rescue nil
   end
 
   def reset_cgroup
