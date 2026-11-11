@@ -1,16 +1,16 @@
 ARG COMPILER_IMAGE=iwillpinchu/judge0-compilers-four:v2-cgroup
 FROM ${COMPILER_IMAGE} AS production
 
-ENV JUDGE0_HOMEPAGE "https://github.com/IWillPinchU/judge0"
+ENV JUDGE0_HOMEPAGE="https://github.com/IWillPinchU/judge0"
 LABEL homepage=$JUDGE0_HOMEPAGE
 
-ENV JUDGE0_SOURCE_CODE "https://github.com/IWillPinchU/judge0"
+ENV JUDGE0_SOURCE_CODE="https://github.com/IWillPinchU/judge0"
 LABEL source_code=$JUDGE0_SOURCE_CODE
 
-ENV JUDGE0_MAINTAINER "IWillPinchU"
+ENV JUDGE0_MAINTAINER="IWillPinchU"
 LABEL maintainer=$JUDGE0_MAINTAINER
 
-ENV JUDGE0_LEAN_MODE "true"
+ENV JUDGE0_LEAN_MODE="true"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -40,5 +40,5 @@ RUN useradd -u 1000 -m -r judge0 && \
 
 USER root
 
-ENV JUDGE0_VERSION "1.2.0"
+ENV JUDGE0_VERSION="1.2.0"
 LABEL version=$JUDGE0_VERSION
