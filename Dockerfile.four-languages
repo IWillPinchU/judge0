@@ -1,59 +1,44 @@
-# Judge0 API Server & Worker - Lightweight 4-Language Edition (C, C++, Java, Python)
 ARG COMPILER_IMAGE=iwillpinchu/judge0-compilers-four:v2-cgroup
 FROM ${COMPILER_IMAGE} AS production
 
-ENV JUDGE0_HOMEPAGE="https://github.com/IWillPinchU/judge0"
+ENV JUDGE0_HOMEPAGE "https://github.com/IWillPinchU/judge0"
 LABEL homepage=$JUDGE0_HOMEPAGE
 
-ENV JUDGE0_SOURCE_CODE="https://github.com/IWillPinchU/judge0"
+ENV JUDGE0_SOURCE_CODE "https://github.com/IWillPinchU/judge0"
 LABEL source_code=$JUDGE0_SOURCE_CODE
 
-ENV JUDGE0_LEAN_MODE="true"
-ENV PATH="/usr/bin:/usr/local/bin:$PATH"
+ENV JUDGE0_MAINTAINER "IWillPinchU"
+LABEL maintainer=$JUDGE0_MAINTAINER
+
+ENV JUDGE0_LEAN_MODE "true"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      procps && \
+    rm -rf /var/lib/apt/lists/*
 
 EXPOSE 2358
 
 WORKDIR /api
 
-# Install Ruby gems
 COPY Gemfile* ./
 RUN bundle config set --local without 'development' && \
     bundle install --jobs=$(nproc)
 
-# Setup cron tasks
 COPY cron /etc/cron.d
-RUN if [ -d /etc/cron.d ] && [ "$(ls -A /etc/cron.d)" ]; then cat /etc/cron.d/* | crontab -; fi
+RUN cat /etc/cron.d/* | crontab -
 
-# Copy application code
 COPY . .
-
-# Install procps (ps, pgrep, top) required for process management
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends procps && \
-    rm -rf /var/lib/apt/lists/*
-
-# Fix Windows CRLF line endings and set execution permissions
-RUN sed -i 's/\r$//' /api/docker-entrypoint.sh /api/scripts/* /api/bin/* && \
-    chmod +x /api/docker-entrypoint.sh /api/scripts/* /api/bin/*
-
-# Patch isolate v2 box limit from default 1000 to INT_MAX (prevents box out-of-range when suite.id >= 1000)
-RUN if [ -f /usr/local/etc/isolate ]; then sed -i 's/^num_boxes\s*=.*/num_boxes = 2147483647/' /usr/local/etc/isolate; fi
 
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
 CMD ["/api/scripts/server"]
 
-# Setup sudo permissions and user
 RUN useradd -u 1000 -m -r judge0 && \
     echo "root ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
     echo "judge0 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    mkdir -p /api/tmp && \
-    chown -R judge0: /api/tmp/
+    chown judge0: /api/tmp/
 
 USER root
 
-ENV JUDGE0_MAINTAINER="IWillPinchU"
-LABEL maintainer=$JUDGE0_MAINTAINER
-
-ENV JUDGE0_VERSION="1.2.0"
+ENV JUDGE0_VERSION "1.2.0"
 LABEL version=$JUDGE0_VERSION
-

@@ -29,6 +29,10 @@
 
 set -uo pipefail
 
+# Use the container's own cgroup as the root, not the cgroupfs root: when the
+# container shares the host cgroup namespace, /sys/fs/cgroup is not ours.
+# /proc/self/cgroup reads "0::/" with a private namespace (unchanged behaviour)
+# and "0::/<path-to-this-container>" with a shared one.
 CG_SELF="$(awk -F: '$1 == "0" {print $3}' /proc/self/cgroup 2>/dev/null)"
 CG_ROOT="/sys/fs/cgroup${CG_SELF%/}"
 
@@ -107,6 +111,17 @@ if setup_cgroup_v2; then
     export OVERRIDE_PER_PROCESS_MEMORY=false
 else
     echo "[entrypoint] cgroup v2 setup unavailable; isolate stays in rlimit mode (memory limits enforced as virtual address)"
+fi
+
+# isolate v2 (ioi/isolate) ships num_boxes=1000 by default. IsolateJob uses
+# `submission.id % INT_MAX` as the box id, so any submission id >= 1000
+# fails with "Sandbox ID out of range". The legacy judge0/isolate fork that
+# the upstream compilers/Dockerfile used had this patched to INT_MAX; that
+# patch was lost when compilers/NewtonDockerfile-v2 switched to ioi/isolate.
+# TODO: move into compilers image (sed default.cf before `make install`) on
+# next compiler base bump and drop this line.
+if [ -f /usr/local/etc/isolate ]; then
+    sed -i 's/^num_boxes\s*=.*/num_boxes = 2147483647/' /usr/local/etc/isolate
 fi
 
 cron
