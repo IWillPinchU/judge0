@@ -44,19 +44,3 @@ spec:
             limits:
               cpu: "8000m"
               memory: "3584Mi"
-          volumeMounts:
-            - name: entrypoint-vol
-              mountPath: /api/docker-entrypoint.sh
-              subPath: docker-entrypoint.sh
-            - name: suite-job-vol
-              mountPath: /api/app/jobs/suite_job.rb
-              subPath: suite_job.rb
-      volumes:
-        - name: entrypoint-vol
-          configMap:
-            name: entrypoint-script
-            defaultMode: 0755
-        - name: suite-job-vol
-          configMap:
-            name: suite-job-script
-            defaultMode: 0644
