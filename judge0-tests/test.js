@@ -20,8 +20,13 @@ async function main() {
   console.log(`   Target Server: ${JUDGE0_URL}`);
   console.log("=======================================================");
 
-  // 1. Health check
+  // 1. Health check & Readiness Probe
   try {
+    const healthRes = await fetch(`${JUDGE0_URL}/healthz`);
+    if (!healthRes.ok) throw new Error(`HTTP ${healthRes.status}`);
+    const health = await healthRes.json();
+    logPass(`Readiness probe /healthz OK: DB=${health.database}, Redis=${health.redis}, Workers=${health.workers}`);
+
     const res = await fetch(`${JUDGE0_URL}/languages`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const langs = await res.json();

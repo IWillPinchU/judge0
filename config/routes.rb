@@ -28,4 +28,5 @@ Rails.application.routes.draw do
   post 'authorize', to: 'sessions#authorize'
 
   get 'workers', to: 'health#workers'
+  get 'healthz', to: 'health#healthz'
 end

@@ -24,4 +24,19 @@ class HealthController < ApplicationController
 
     render json: json
   end
+
+  def healthz
+    db_ok = ActiveRecord::Base.connection.active? rescue false
+    redis_ok = (Resque.redis.ping == "PONG") rescue false
+    workers_count = Resque.workers.size rescue 0
+
+    all_ok = db_ok && redis_ok && workers_count > 0
+
+    render json: {
+      status: all_ok ? "ok" : "degraded",
+      database: db_ok ? "connected" : "disconnected",
+      redis: redis_ok ? "connected" : "disconnected",
+      workers: workers_count
+    }, status: all_ok ? :ok : :service_unavailable
+  end
 end
