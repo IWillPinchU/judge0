@@ -30,7 +30,7 @@ RUN cat /etc/cron.d/* | crontab -
 
 COPY . .
 
-RUN chmod +x /api/scripts/workers-priority
+RUN chmod 0755 /api/scripts/workers-priority
 
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
 CMD ["/api/scripts/server"]
