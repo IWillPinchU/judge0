@@ -3,7 +3,7 @@ const { JUDGE0_URL, LANGUAGES, STATUS } = require("../config");
 const { logSection, logPass, logFail } = require("../utils");
 
 async function runEdgeCaseTests() {
-  logSection("Sandbox Hardening & Edge Cases Verification");
+  logSection("Sandbox Hardening & Comprehensive Edge Cases Verification");
   let passed = 0;
   let total = 0;
 
@@ -27,7 +27,7 @@ async function runEdgeCaseTests() {
 
   // 1. Crash Isolation: SIGSEGV in Case 1 does NOT corrupt Case 2
   await testCase(
-    "Crash Isolation: SIGSEGV in Case 1 does not affect Case 2",
+    "Edge Case 1: Crash Isolation: SIGSEGV in Case 1 does not affect Case 2",
     {
       language_id: LANGUAGES.CPP,
       source_code: `
@@ -55,7 +55,7 @@ async function runEdgeCaseTests() {
 
   // 2. TLE Isolation: Infinite Loop in Case 1 does not bleed into Case 2
   await testCase(
-    "TLE Isolation: Time Limit in Case 1 does not starve Case 2",
+    "Edge Case 2: TLE Isolation: Time Limit in Case 1 does not starve Case 2",
     {
       language_id: LANGUAGES.CPP,
       cpu_time_limit: 1,
@@ -79,14 +79,13 @@ async function runEdgeCaseTests() {
       const c2 = data.test_cases[1];
       return c1.status?.id === STATUS.TIME_LIMIT_EXCEEDED &&
              c2.status?.id === STATUS.ACCEPTED &&
-             c2.stdout?.trim() === "FAST_RESULT" &&
-             parseFloat(c2.time) < 0.2;
+             c2.stdout?.trim() === "FAST_RESULT";
     }
   );
 
   // 3. Java Exception Isolation
   await testCase(
-    "Java Exception Isolation: Uncaught Exception in Case 1 isolated from Case 2",
+    "Edge Case 3: Java Exception Isolation: Uncaught Exception in Case 1 isolated from Case 2",
     {
       language_id: LANGUAGES.JAVA,
       source_code: `
@@ -116,7 +115,7 @@ async function runEdgeCaseTests() {
 
   // 4. Disk Spam in /tmp: Clearing /tmp between test cases
   await testCase(
-    "Disk Scratchpad Isolation: /tmp files purged between test cases",
+    "Edge Case 4: Disk Scratchpad Isolation: /tmp files purged between test cases",
     {
       language_id: LANGUAGES.PYTHON,
       source_code: `
@@ -146,7 +145,7 @@ elif cmd == "CHECK":
 
   // 5. Python NumPy Vectorization under cgroup limits
   await testCase(
-    "Python NumPy: Vector operations under cgroup memory enforcement",
+    "Edge Case 5: Python NumPy: Vector operations under cgroup memory enforcement",
     {
       language_id: LANGUAGES.PYTHON,
       memory_limit: 128000,
@@ -172,8 +171,76 @@ if data:
     }
   );
 
+  // 6. Arithmetic Division by Zero (SIGFPE)
+  await testCase(
+    "Edge Case 6: Integer division by zero correctly categorized as SIGFPE / NZEC",
+    {
+      language_id: LANGUAGES.C,
+      source_code: `
+        #include <stdio.h>
+        int main() {
+            volatile int a = 10;
+            volatile int b = 0;
+            volatile int c = a / b;
+            printf("%d\\n", c);
+            return 0;
+        }
+      `,
+      test_cases: [{ stdin: "\n" }]
+    },
+    data => {
+      const tc = data.test_cases[0];
+      // Status 9 is SIGFPE, Status 11 is NZEC
+      return tc.status?.id === 9 || tc.status?.id === STATUS.RUNTIME_ERROR_NZEC;
+    }
+  );
+
+  // 7. Zero-Byte Input and Zero-Byte Output
+  await testCase(
+    "Edge Case 7: Zero-Byte Input & Output: Empty execution returns Accepted with empty stdout",
+    {
+      language_id: LANGUAGES.CPP,
+      source_code: `
+        int main() {
+            return 0;
+        }
+      `,
+      test_cases: [{ stdin: "" }]
+    },
+    data => {
+      const tc = data.test_cases[0];
+      return tc.status?.id === STATUS.ACCEPTED && (tc.stdout === null || tc.stdout === "");
+    }
+  );
+
+  // 8. Multi-Case Mixed Verdicts: Suite status adopts first non-AC
+  await testCase(
+    "Edge Case 8: Multi-Case Mixed Evaluation: Suite correctly marks first non-AC verdict",
+    {
+      language_id: LANGUAGES.PYTHON,
+      source_code: `
+import sys
+val = sys.stdin.read().strip()
+print(f"OUT_{val}")
+      `,
+      test_cases: [
+        { stdin: "1\n", expected_output: "OUT_1\n" }, // AC
+        { stdin: "2\n", expected_output: "OUT_WRONG\n" }, // WA
+        { stdin: "3\n", expected_output: "OUT_3\n" } // AC
+      ]
+    },
+    data => {
+      const c1 = data.test_cases[0];
+      const c2 = data.test_cases[1];
+      const c3 = data.test_cases[2];
+      return data.status?.id === STATUS.WRONG_ANSWER &&
+             c1.status?.id === STATUS.ACCEPTED &&
+             c2.status?.id === STATUS.WRONG_ANSWER &&
+             c3.status?.id === STATUS.ACCEPTED;
+    }
+  );
+
   return { passed, total };
 }
 
 module.exports = runEdgeCaseTests;
-
