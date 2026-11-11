@@ -51,3 +51,4 @@ Key environment variables in `judge0.conf`:
 - **`worker`**: Resque job processor running `scripts/workers` with cgroup v2 sandbox isolation.
 - **`db`**: PostgreSQL 16.2 database storing submission and suite records.
 - **`redis`**: Redis 7.2.4 queue storing async background jobs.
+
