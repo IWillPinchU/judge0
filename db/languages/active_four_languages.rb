@@ -11,7 +11,7 @@
     name: "C (GCC 12.2.0)",
     is_archived: false,
     source_file: "main.c",
-    compile_cmd: "/usr/bin/gcc -O3 %s main.c",
+    compile_cmd: "/usr/bin/gcc -O3 -Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=int-conversion -Wno-error=incompatible-pointer-types %s main.c",
     run_cmd: "./a.out"
   },
   {
