@@ -204,3 +204,28 @@ A dedicated verification script (`judge0-tests/tests/test-priority-queuing.js`) 
 4. Build `iwillpinchu/judge0-four:v2-priority-queues` and test the stack locally.
 5. Run the priority verification test and benchmark results.
 
+---
+
+## 5. Verification & Status
+
+### Test Run Results (Against `v2-priority-queues`)
+- **Total Tests Executed:** 29
+- **Passed:** 29 (100%)
+- **Failed:** 0
+
+| Test Module | Passed | Total | Rate | Notes |
+| :--- | :---: | :---: | :---: | :--- |
+| **Wait Parameter (Sync/Async)** | 4 | 4 | 100% | Synchronous and asynchronous suites |
+| **Base64 Encoding Modes** | 3 | 3 | 100% | Base64 true, false, and omitted |
+| **Field Filtering & Validation** | 4 | 4 | 100% | Field slicing and invalid field handling |
+| **Languages (C, C++, Java, Python)** | 5 | 5 | 100% | All 4 compilers & runtimes |
+| **Security Hardening (0555 & Sandbox)** | 2 | 2 | 100% | Inter-test-case file isolation & binary write lock |
+| **Edge Cases & Crash Isolation** | 5 | 5 | 100% | SIGSEGV, TLE, and Java exceptions isolated |
+| **Intelligent Priority Queuing** | 6 | 6 | 100% | Threshold, single, small/large suites, batch, /workers |
+
+### Git & Image Segregation
+- **Dedicated Branch:** `feat/intelligent-priority-queuing` (pushed to `myfork`)
+- **Priority Image:** `iwillpinchu/judge0-four:v2-priority-queues`
+- **Main Production Image:** `iwillpinchu/judge0-four:v2-cgroup` (completely untouched)
+- **Main Compose Stack:** `docker-compose.four-languages.yml` (completely untouched)
+
