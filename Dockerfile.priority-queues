@@ -35,13 +35,6 @@ RUN chmod +x /api/scripts/workers-priority
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
 CMD ["/api/scripts/server"]
 
-RUN useradd -u 1000 -m -r judge0 && \
-    echo "root ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
-    echo "judge0 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    chown judge0: /api/tmp/
-
-USER root
-
 ENV JUDGE0_VERSION="1.2.0-priority"
 LABEL version=$JUDGE0_VERSION
 
