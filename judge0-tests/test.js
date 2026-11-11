@@ -8,6 +8,7 @@ const runLanguageTests = require("./tests/test-languages");
 const runSecurityTests = require("./tests/test-security");
 const runEdgeCaseTests = require("./tests/test-edge-cases");
 const runProbe = require("./tests/probe-callback-ip");
+const runPriorityQueuingTests = require("./tests/test-priority-queuing");
 
 const args = process.argv.slice(2);
 const runAll = args.length === 0 || args.includes("--all");
@@ -56,6 +57,11 @@ async function main() {
   // 5. Edge Cases
   if (shouldRun("--edge") || shouldRun("--edge-cases")) {
     results.push({ name: "Edge Cases & Crash Isolation", ...(await runEdgeCaseTests()) });
+  }
+
+  // 6. Priority Queuing
+  if (shouldRun("--priority") || shouldRun("--queues")) {
+    results.push({ name: "Intelligent Priority Queuing", ...(await runPriorityQueuingTests()) });
   }
 
   // 6. Callback Probe (explicit only)

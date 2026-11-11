@@ -1,0 +1,97 @@
+#!/bin/bash
+# Script for running Judge0 workers with Intelligent Priority Queuing.
+#
+# Usage: ./scripts/workers-priority
+#
+source ./scripts/load-config
+export | sudo tee /api/environment
+
+run_resque=1
+resque_fast_pid=0
+resque_default_pid=0
+scheduler_pid=0
+
+date_now() {
+    echo -n $(date +"%Y-%m-%d-%H-%M-%S")
+}
+
+# Calculate worker allocation
+TOTAL_WORKERS=${COUNT:-$(( $(nproc) * 2 ))}
+
+if [[ -n "$FAST_QUEUE_WORKERS" && -n "$DEFAULT_QUEUE_WORKERS" ]]; then
+    FAST_COUNT=$FAST_QUEUE_WORKERS
+    DEFAULT_COUNT=$DEFAULT_QUEUE_WORKERS
+else
+    if [[ $TOTAL_WORKERS -le 1 ]]; then
+        FAST_COUNT=1
+        DEFAULT_COUNT=0
+    else
+        FAST_COUNT=$(( (TOTAL_WORKERS + 2) / 4 ))
+        [[ $FAST_COUNT -lt 1 ]] && FAST_COUNT=1
+        DEFAULT_COUNT=$(( TOTAL_WORKERS - FAST_COUNT ))
+    fi
+fi
+
+FAST_QUEUE="fast,default"
+DEFAULT_QUEUE="default,fast"
+
+echo "[$(date_now)] Priority Queuing initialized:"
+echo "  Total worker target: $TOTAL_WORKERS"
+echo "  Fast priority pool:  $FAST_COUNT workers (listening to: $FAST_QUEUE)"
+if [[ $DEFAULT_COUNT -gt 0 ]]; then
+    echo "  Default pool:        $DEFAULT_COUNT workers (listening to: $DEFAULT_QUEUE)"
+else
+    echo "  Default pool:        disabled (single worker mode handles both queues)"
+fi
+echo "  Fast suite threshold: <= ${FAST_QUEUE_THRESHOLD:-5} test cases"
+
+exit_gracefully() {
+    echo "[$(date_now)] Killing priority workers..."
+    run_resque=0
+    if [[ $resque_fast_pid -ne 0 ]]; then
+        kill -SIGQUIT $(pgrep -P $resque_fast_pid) 2>/dev/null
+        kill -SIGTERM $resque_fast_pid 2>/dev/null
+    fi
+    if [[ $resque_default_pid -ne 0 ]]; then
+        kill -SIGQUIT $(pgrep -P $resque_default_pid) 2>/dev/null
+        kill -SIGTERM $resque_default_pid 2>/dev/null
+    fi
+    if [[ $scheduler_pid -ne 0 ]]; then
+        kill -SIGTERM $scheduler_pid 2>/dev/null
+    fi
+}
+
+trap exit_gracefully SIGTERM SIGINT
+
+mkdir -p tmp/pids &> /dev/null
+while [[ $run_resque -eq 1 ]]; do
+    echo "[$(date_now)] Starting scheduler..."
+    if ! kill -0 $scheduler_pid 2>/dev/null; then
+        rake resque:scheduler &
+        scheduler_pid=$!
+    fi
+
+    rm -rf tmp/pids/resque*.pid &> /dev/null
+
+    echo "[$(date_now)] Starting fast priority workers ($FAST_COUNT on $FAST_QUEUE)..."
+    QUEUE="$FAST_QUEUE" COUNT="$FAST_COUNT" rails resque:workers &
+    resque_fast_pid=$!
+
+    if [[ $DEFAULT_COUNT -gt 0 ]]; then
+        echo "[$(date_now)] Starting default priority workers ($DEFAULT_COUNT on $DEFAULT_QUEUE)..."
+        QUEUE="$DEFAULT_QUEUE" COUNT="$DEFAULT_COUNT" rails resque:workers &
+        resque_default_pid=$!
+    fi
+
+    while [[ $run_resque -eq 1 ]] && kill -0 $resque_fast_pid 2>/dev/null && ( [[ $DEFAULT_COUNT -eq 0 ]] || kill -0 $resque_default_pid 2>/dev/null ); do
+        sleep 1s
+    done
+
+    if [[ $run_resque -eq 1 ]]; then
+        echo "[$(date_now)] One or more worker pools stopped. Restarting in 2s..."
+        [[ $resque_fast_pid -ne 0 ]] && kill -9 $(pgrep -P $resque_fast_pid) 2>/dev/null
+        [[ $resque_default_pid -ne 0 ]] && kill -9 $(pgrep -P $resque_default_pid) 2>/dev/null
+        sleep 2s
+    fi
+done
+

@@ -138,12 +138,14 @@ class SubmissionsController < ApplicationController
 
     submissions = params[:submissions].each.collect{ |p| Submission.new(submission_params(p)) }
 
+    target_queue = submissions.size <= Config::FAST_QUEUE_THRESHOLD ? :fast : :default
+
     response = []
     has_valid_submission = false
 
     submissions.each do |submission|
       if submission.save
-        IsolateRunner.perform_later(submission)
+        IsolateRunner.perform_later(submission, queue: target_queue)
         response << { token: submission.token }
         has_valid_submission = true
       else
@@ -206,7 +208,8 @@ class SubmissionsController < ApplicationController
 
   def check_queue_size
     number_of_submissions = params[:submissions].try(:size).presence || 1
-    if Resque.size(ENV["JUDGE0_VERSION"]) + number_of_submissions > Config::MAX_QUEUE_SIZE
+    total_queued = Resque.queues.sum { |q| Resque.size(q) rescue 0 }
+    if total_queued + number_of_submissions > Config::MAX_QUEUE_SIZE
       render json: { error: "queue is full" }, status: :service_unavailable
     end
   end

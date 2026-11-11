@@ -32,8 +32,8 @@ module IsolateRunner
     end
   end
 
-  def self.perform_later(submission)
+  def self.perform_later(submission, queue: :fast)
     submission.update(status: Status.queue, queued_at: DateTime.now, queue_host: ENV["HOSTNAME"])
-    IsolateJob.perform_later(submission.id)
+    IsolateJob.set(queue: queue).perform_later(submission.id)
   end
 end

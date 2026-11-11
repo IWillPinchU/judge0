@@ -38,6 +38,7 @@ export AUTHZ_HEADER=${AUTHZ_HEADER:-X-Auth-User}
 export INTERVAL=${INTERVAL:-0.1}
 export COUNT=${COUNT:-$(( $(nproc) * 2 ))}
 export QUEUE=${JUDGE0_VERSION:-unknown} # This option is not available in judge0.conf
+export FAST_QUEUE_THRESHOLD=${FAST_QUEUE_THRESHOLD:-5}
 
 # Database
 export REDIS_HOST=${REDIS_HOST:-localhost}

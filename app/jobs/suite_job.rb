@@ -1,7 +1,7 @@
 class SuiteJob < ApplicationJob
   retry_on RuntimeError, wait: 0.1.seconds, attempts: 100
 
-  queue_as ENV["JUDGE0_VERSION"].to_sym
+  queue_as :default
 
   STDIN_FILE_NAME = "stdin.txt"
   STDOUT_FILE_NAME = "stdout.txt"

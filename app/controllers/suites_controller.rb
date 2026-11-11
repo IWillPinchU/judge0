@@ -125,7 +125,8 @@ class SuitesController < ApplicationController
   end
 
   def check_queue_size
-    if Resque.size(ENV["JUDGE0_VERSION"]) + 1 > Config::MAX_QUEUE_SIZE
+    total_queued = Resque.queues.sum { |q| Resque.size(q) rescue 0 }
+    if total_queued + 1 > Config::MAX_QUEUE_SIZE
       render json: { error: "queue is full" }, status: :service_unavailable
     end
   end

@@ -1,0 +1,47 @@
+ARG COMPILER_IMAGE=iwillpinchu/judge0-compilers-four:v2-cgroup
+FROM ${COMPILER_IMAGE} AS production
+
+ENV JUDGE0_HOMEPAGE "https://github.com/IWillPinchU/judge0"
+LABEL homepage=$JUDGE0_HOMEPAGE
+
+ENV JUDGE0_SOURCE_CODE "https://github.com/IWillPinchU/judge0"
+LABEL source_code=$JUDGE0_SOURCE_CODE
+
+ENV JUDGE0_MAINTAINER "IWillPinchU"
+LABEL maintainer=$JUDGE0_MAINTAINER
+
+ENV JUDGE0_LEAN_MODE "true"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      procps && \
+    rm -rf /var/lib/apt/lists/*
+
+EXPOSE 2358
+
+WORKDIR /api
+
+COPY Gemfile* ./
+RUN bundle config set --local without 'development' && \
+    bundle install --jobs=$(nproc)
+
+COPY cron /etc/cron.d
+RUN cat /etc/cron.d/* | crontab -
+
+COPY . .
+
+RUN chmod +x /api/scripts/workers-priority
+
+ENTRYPOINT ["/api/docker-entrypoint.sh"]
+CMD ["/api/scripts/server"]
+
+RUN useradd -u 1000 -m -r judge0 && \
+    echo "root ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+    echo "judge0 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    chown judge0: /api/tmp/
+
+USER root
+
+ENV JUDGE0_VERSION "1.2.0-priority"
+LABEL version=$JUDGE0_VERSION
+
